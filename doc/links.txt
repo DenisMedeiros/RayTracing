@@ -1,0 +1,13 @@
+RayTracing
+
+https://www.scratchapixel.com/lessons/3d-basic-rendering/introduction-to-ray-tracing
+
+https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes
+
+https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-generating-camera-rays/generating-camera-rays
+
+OpenGL
+
+https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/glDrawPixels.xml
+
+

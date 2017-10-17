@@ -1,0 +1,121 @@
+
+The ray tracing algorithm: a simplistic pseudocode version
+
+Select eye point (E), look point (L), up vector
+
+Set screen plane to be centred on L, perpendicular to vector EL
+
+Set screen size and number of pixel
+
+For each pixel {
+
+     Define D to be the unit vector pointing from E to the centre of the pixel
+
+     Raytrace(E, D)
+
+}
+
+ 
+
+function Raytrace(E, D) returns Colour {
+
+     nearest_t = infinity
+
+     nearest_object = NULL
+
+     for each object {
+
+          find t, the smallest, non-negative real solution of the ray/object
+                        intersection equation
+
+          if t exists {
+
+              if t < nearest_t {
+
+                   nearest_t = t
+
+                   nearest_object = current object
+
+              }
+
+          }
+
+     }
+
+     colour = black
+
+     if nearest_object exists {
+
+          find normal vector, N, at intersection point
+
+          if object is reflective {
+
+              reflected_colour=Raytrace(intersection point, reflection vector)
+
+              colour += reflection_coeff * reflected_colour ;
+
+          }
+
+          if object is refractive {
+
+              refracted_colour=Raytrace(intersection point, refracted vector)
+
+              colour += refraction_coeff * refracted_colour ;
+
+          }
+
+          for each light {
+
+              if shadow_ray(intersection point, light position) returns No_Shadow {
+
+                   calculate light s colour contribution by doing the illumination calculations
+
+                                    using D, N, the current light, and the object properties
+
+                   colour += light s colour contribution
+
+              }
+
+          }
+
+     }
+
+     return colour
+
+}
+
+ 
+
+ 
+
+function shadow_ray(point1, point2) returns Shadow or No_Shadow {
+
+     ray defined with E=point1, D=point2-point1
+
+     nearest_t = infinity
+
+     nearest_object = NULL
+
+     for each object {
+
+          find t, the smallest, non-negative real solution of the ray/object
+                        intersection equation
+
+          if t exists {
+
+              if t < nearest_t {
+
+                   nearest_t = t
+
+              }
+
+          }
+
+     }
+
+     if t <1 return Shadow
+
+     else return No_Shadow
+
+}
+
