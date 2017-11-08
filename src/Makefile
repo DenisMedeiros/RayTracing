@@ -2,7 +2,7 @@ src = $(wildcard *.c)
 obj = $(src:.c=.o)
 
 
-LDFLAGS = -lm
+LDFLAGS = -lm -lGL -lGLU -lglut
 
 all: main
 
