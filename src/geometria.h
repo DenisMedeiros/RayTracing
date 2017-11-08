@@ -30,9 +30,9 @@ typedef vetor ponto;
  * Ela contem as 3 componentes de R, G e B, respectivamente. 
  */
 typedef struct {
-    double r;
-    double g;
-    double b;
+    float r;
+    float g;
+    float b;
 } cor;
 
 /** 
