@@ -8,9 +8,9 @@
  * @param v2 Ponteiro para o segundo vetor.
  * @return Resultado da soma de v1 e v2 (v1 + v2).
  */
-vetor soma_v(vetor* v1, vetor* v2)
+vetor_t soma_v(vetor_t *v1, vetor_t *v2)
 {
-    vetor v3;
+    vetor_t v3;
     v3.x = v1->x + v2->x;
     v3.y = v1->y + v2->y;
     v3.z = v1->z + v2->z;
@@ -24,9 +24,9 @@ vetor soma_v(vetor* v1, vetor* v2)
  * @param v2 Ponteiro para o segundo vetor.
  * @return Resultado da subtração de v1 por v2 (v1 - v2).
  */
-vetor sub_v(vetor* v1, vetor* v2)
+vetor_t sub_v(vetor_t *v1, vetor_t *v2)
 {
-    vetor v3;
+    vetor_t v3;
     v3.x = v1->x - v2->x;
     v3.y = v1->y - v2->y;
     v3.z = v1->z - v2->z;
@@ -40,9 +40,9 @@ vetor sub_v(vetor* v1, vetor* v2)
  * @param k Escalar que multiplica o vetor v1.
  * @return Produto de k por v1.
  */
-vetor mult_e(vetor* v1, double k)
+vetor_t mult_e(vetor_t *v1, double k)
 {
-    vetor v2;
+    vetor_t v2;
     v2.x = v1->x * k;
     v2.y = v1->y * k;
     v2.z = v1->z * k;
@@ -56,9 +56,9 @@ vetor mult_e(vetor* v1, double k)
  * @param v2 Ponteiro para o segundo vetor.
  * @return Resultado da multiplicação elemento a elemento de v1 e v2.
  */
-vetor mult_v(vetor* v1, vetor* v2)
+vetor_t mult_v(vetor_t *v1, vetor_t *v2)
 {
-    vetor v3;
+    vetor_t v3;
     v3.x = v1->x * v2->x;
     v3.y = v1->y * v2->y;
     v3.z = v1->z * v2->z;
@@ -71,9 +71,9 @@ vetor mult_v(vetor* v1, vetor* v2)
  * @param v1 Ponteiro para o vetor.
  * @return Vetor v1 com o sentido invertido (-v1).
  */
-vetor neg_v(vetor *v1)
+vetor_t neg_v(vetor_t *v1)
 {
-    vetor v2;
+    vetor_t v2;
     v2.x = -v1->x;
     v2.y = -v1->y;
     v2.z = -v1->z;
@@ -86,7 +86,7 @@ vetor neg_v(vetor *v1)
  * @param v1 Ponteiro para o vetor.
  * @return Módulo (norma) do vetor v1.
  */
-double modulo(vetor *v1)
+double modulo(vetor_t *v1)
 {
     return sqrt(v1->x * v1->x + v1->y * v1->y + v1->z * v1->z);
 }
@@ -98,9 +98,9 @@ double modulo(vetor *v1)
  * @param v1 Ponteiro para o vetor a ser normalizado.
  * @return Vetor v1 normalizado.
  */
-vetor normalizar(vetor* v1)
+vetor_t normalizar(vetor_t *v1)
 {
-    vetor v2;
+    vetor_t v2;
     double norma = modulo(v1);
     v2.x = v1->x/norma;
     v2.y = v1->y/norma;
@@ -115,7 +115,7 @@ vetor normalizar(vetor* v1)
  * @param v2 Ponteiro para o segundo vetor.
  * @return Resultado do produto escalar entre v1 e v2.
  */
-double prod_e(vetor* v1, vetor* v2)
+double prod_e(vetor_t *v1, vetor_t *v2)
 {
     return v1->x * v2->x + v1->y * v2->y + v1->z * v2->z;
 }
@@ -134,18 +134,18 @@ double prod_e(vetor* v1, vetor* v2)
  * origem e o segundo ponto de interseção (é modificada na função).
  * @return 1 se o raio intersecta a esfera, 0 caso contrário.
  */ 
-int intersecao_esfera(ponto *origem_raio, vetor *direcao_raio, esfera *esf, double *t0, double *t1)
+int intersecao_esfera(ponto_t *origem_raio, vetor_t *direcao_raio, esfera_t *esfera, double *t0, double *t1)
 {
-    vetor distancia;
+    vetor_t distancia;
     double res;
     double quad_raio;
     double quad_cateto;
     double diferenca;
     
-    quad_raio = (esf->raio * esf->raio);
+    quad_raio = (esfera->raio * esfera->raio);
     
     /* Calcula o vetor distância entre o ponto de origem e o centro da esfera. */
-    distancia = sub_v(&esf->centro, origem_raio); 
+    distancia = sub_v(&esfera->centro, origem_raio); 
     
     /* Verifica se o ângulo entre o vetor distância e a direção do raio está entre -90° e +90° */
     res = prod_e(&distancia, direcao_raio);
@@ -171,6 +171,26 @@ int intersecao_esfera(ponto *origem_raio, vetor *direcao_raio, esfera *esf, doub
     return 1;
 }
 
+/**
+ * Verifica se um determinado raio intersecta uma cubo no espaço.
+ * 
+ * @param origem_raio Ponteiro para o ponto no espaço de onde o 
+ * raio parte.
+ * @param direcao_raio Ponteiro para o vetor que determina a direção
+ * do raio.
+ * @param esf Ponteiro para o cubo a ser intersectado.
+ * @param t0 Ponteiro para a distância horizontal entre o ponto de 
+ * origem e o primeiro ponto de interseção (é modificada na função).
+ * @param t1 Ponteiro para a distância horizontal entre o ponto de 
+ * origem e o segundo ponto de interseção (é modificada na função).
+ * @return 1 se o raio intersecta o cubo, 0 caso contrário.
+ */ 
+int intersecao_cubo(ponto_t *origem_raio, vetor_t *direcao_raio, cubo_t *c, double *t0, double *t1)
+{
+    // TODO
+    return 0;
+}
+
 /** 
  * Faz a operação de raytracing resursiva. 
  * 
@@ -181,45 +201,65 @@ int intersecao_esfera(ponto *origem_raio, vetor *direcao_raio, esfera *esf, doub
  * @param esferas Array com esferas colocadas no espaço.
  * @param num_esferas Número de esferas do array anterior.
  * 
- * 
  */
-cor raytrace(ponto *origem_raio, vetor *direcao_raio, esfera *esferas, int num_esferas)
+cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, int num_objetos)
 {
-    cor c;
+    cor_t cor;
     double tperto, t0, t1;
-    esfera *esf;
     int i;
  
-    tperto = INFINITO;
-    esf = 0;
-    c.r = 0.0;
-    c.g = 0.0;
-    c.b = 0.0;
+    tperto = INFINITO; 
+
+    /* Se não tocar nenhum objeto, então a cor será negativa. */
+    cor.r = -1.0;
+    cor.g = -1.0;
+    cor.b = -1.0;
     
     /* Encontra a interseção do raio com uma esfera da cena. */
-    for (i = 0; i < num_esferas; ++i) 
+    for (i = 0; i < num_objetos; ++i) 
     {
         t0 = INFINITO; 
         t1 = INFINITO;
-        if (intersecao_esfera(origem_raio, direcao_raio, &esferas[i], &t0, &t1)) 
+
+        switch(objetos[i].tipo)
         {
-            if (t0 < 0)
-            { 
-                t0 = t1;
-            }
-            if (t0 < tperto) 
+        case ESFERA:
+            if (intersecao_esfera(origem_raio, direcao_raio, objetos[i].esfera, &t0, &t1)) 
             {
-                tperto = t0;
-                esf = &esferas[i];
+                if (t0 < 0)
+                { 
+                    t0 = t1;
+                }
+                if (t0 < tperto) 
+                {
+                    tperto = t0;
+                    //esf = &esferas[i];
+                    cor = objetos[i].esfera->cor;
+                }
             }
+            break;  
+
+        case CUBO:
+            if (intersecao_cubo(origem_raio, direcao_raio, objetos[i].cubo, &t0, &t1)) 
+            {
+                if (t0 < 0)
+                { 
+                    t0 = t1;
+                }
+                if (t0 < tperto) 
+                {
+                    tperto = t0;
+                    //esf = &esferas[i];
+                }
+            }
+
+
+            break;
+        default:
+            break;
         }
+
     }
-    
-    /* O raio não tocou nenhuma esfera. */
-    if(esf == 0)
-    {
-        return c;
-    }
-    
-    return c;
+       
+    return cor;
 }

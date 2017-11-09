@@ -6,9 +6,10 @@
 #include "geometria.h"
 
 #define NUM_ESFERAS 2
-#define NUM_CUBOS 1
+#define NUM_CUBOS 0
+#define NUM_OBJETOS (NUM_ESFERAS + NUM_CUBOS)
 
-esfera esferas[NUM_ESFERAS];
+objeto_t objetos[NUM_OBJETOS];
 
 float *pixels;
 
@@ -28,9 +29,9 @@ void display(void)
     GLdouble x_far, y_far, z_far;
     
     int i, j, altura, largura;
-    ponto origem; // Ponto de origem
-    vetor dir; // Vetor direção.
-    cor pixel;
+    ponto_t origem; // Ponto de origem
+    vetor_t dir; // Vetor direção.
+    cor_t pixel;
     
     glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(1.0, 1.0, 1.0);
@@ -64,7 +65,7 @@ void display(void)
             win_y = j;
             
             // Subtrai y a altura da janela.
-            win_y = altura - win_y;
+            //win_y = altura - win_y;
             
             // Obtém o ponto no plano near.
             gluUnProject(win_x, win_y, 0.0, model_view, projection, view_port, &x_near, &y_near, &z_near);
@@ -83,13 +84,14 @@ void display(void)
             dir.z = z_far - z_near;
             
             // Normaliza o vetor direção.
-            dir = normalizar(&dir);
+            //dir = normalizar(&dir);
             
-            //printf("(%lf, %lf, %lf)\n", (double) dir.x, (double) dir.y, (double) dir.z);
+            //printf("Ponto origem: (%lf, %lf, %lf)\n", (double) x_near, (double) y_near, (double) z_near);
+            //printf("Vetor direção: (%lf, %lf, %lf)\n", (double) dir.x, (double) dir.y, (double) dir.z);
             //exit(0); // DEBUG: para após o primeiro
             
             // Faz o raytracing.
-            //pixel = raytrace(&origem, &dir, esferas, NUM_ESFERAS);
+            pixel = raytrace(&origem, &dir, objetos, NUM_OBJETOS);
             
             pixel.r = 0.1 + 0.001 * j;
             pixel.g = 0.2 + 0.002 * i;
@@ -146,8 +148,9 @@ int main(int argc, char** argv)
 {
 
     // Criação das esferas
-    ponto centro1, centro2;
-    
+    ponto_t centro1, centro2;
+    cor_t cor1, cor2;
+
     centro1.x = 10;
     centro1.y = 10;
     centro1.z = 10;
@@ -155,13 +158,27 @@ int main(int argc, char** argv)
     centro2.x = 10;
     centro2.y = 20;
     centro2.z = 20;
-    
-    esferas[0].centro = centro1;
-    esferas[0].raio = 2;
-    
-    esferas[1].centro = centro2;
-    esferas[1].raio = 2;
-    
+
+    cor1.r = 1.0;
+    cor1.g = 0.0;
+    cor1.b = 0.0;
+
+    cor2.r = 0.0;
+    cor2.g = 0.0;
+    cor2.b = 1.0;
+
+    objetos[0].tipo = ESFERA;
+    objetos[0].esfera = malloc(sizeof(esfera_t));
+    objetos[0].esfera->centro = centro1;
+    objetos[0].esfera->raio = 2;
+    objetos[0].esfera->cor = cor1;
+   
+    objetos[1].tipo = ESFERA;
+    objetos[1].esfera = malloc(sizeof(esfera_t));
+    objetos[1].esfera->centro = centro2;
+    objetos[1].esfera->raio = 2;
+    objetos[1].esfera->cor = cor2;
+
     pixels = NULL;
 
     glutInit(&argc, argv);
@@ -174,5 +191,9 @@ int main(int argc, char** argv)
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
     glutMainLoop();
+
+    free(objetos[0].esfera);
+    free(objetos[1].esfera);
+
     return 0;
 }
