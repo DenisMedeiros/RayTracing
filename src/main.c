@@ -2,19 +2,25 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
-
 #include "geometria.h"
+
+/* Configurações básicas. */
 
 #define NUM_ESFERAS 2
 #define NUM_CUBOS 0
 #define NUM_OBJETOS (NUM_ESFERAS + NUM_CUBOS)
 
-objeto_t objetos[NUM_OBJETOS];
+#define Z_NEAR 1.0
+#define Z_FAR 20.0
 
+/* Variáveis globais. */
 ponto_t look_from = {0.0, 0.0, 5.0};
 ponto_t look_at = {0.0, 0.0, 0.0};
 
-float *pixels;
+ponto_t posicao_luz = {-5.0, 0, 2.0};
+cor_t cor_luz = {1.0, 1.0, 0.0};
+
+objeto_t objetos[NUM_OBJETOS];
 
 void init(void) 
 {
@@ -30,11 +36,14 @@ void display(void)
     GLdouble win_x, win_y; // Coornadas x e y.
     GLdouble x_near, y_near, z_near;
     GLdouble x_far, y_far, z_far;
-    
+
+    float *pixels; // Matriz de píxels de 3 canais.
     int i, j, altura, largura;
     ponto_t origem; // Ponto de origem
     vetor_t dir; // Vetor direção.
     cor_t pixel;
+
+    pixels = NULL;
     
     glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(1.0, 1.0, 1.0);
@@ -103,19 +112,12 @@ void display(void)
             pixels[(i * largura * 3) + (j * 3) + 1] = pixel.g;
             pixels[(i * largura * 3) + (j * 3) + 2] = pixel.b;    
             
-
-            
-
-        
         }
     }
 
     
     glDrawPixels(view_port[2], view_port[3], GL_RGB, GL_FLOAT, pixels);
-
-            
-
-        
+ 
     glPopMatrix();
     glutSwapBuffers();
     glutSwapBuffers();
@@ -126,26 +128,26 @@ void reshape (int w, int h)
     glViewport(0, 0, (GLsizei) w, (GLsizei) h); 
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
-    gluPerspective(60.0, (GLfloat) w/(GLfloat) h, 1.0, 20.0);
+    gluPerspective(60.0, (GLfloat) w/(GLfloat) h, Z_NEAR, Z_FAR);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt (0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+    gluLookAt (look_from.x, look_from.y, look_from.z, look_at.x, look_at.y, look_at.z, 0.0, 1.0, 0.0);
 }
 
 void keyboard (unsigned char key, int x, int y)
 {
     switch (key) 
     {
-        case 'a':
-            //
+        case 'x':
+            glRotatef(15.0, 1.0, 0.0, 0.0);
             glutPostRedisplay();
             break;
-        case 'b':
-            //
+        case 'y':
+            glRotatef(15.0, 0.0, 1.0, 0.0);
             glutPostRedisplay();
             break;
-        case 'c':
-            //
+        case 'z':
+            glRotatef(15.0, 0.0, 0.0, 1.0);
             glutPostRedisplay();
             break;
         default:
@@ -188,9 +190,6 @@ int main(int argc, char** argv)
     objetos[1].esfera->centro = centro2;
     objetos[1].esfera->raio = 3;
     objetos[1].esfera->cor = cor2;
-
-
-    pixels = NULL;
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
