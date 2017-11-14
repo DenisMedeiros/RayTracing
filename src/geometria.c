@@ -202,7 +202,7 @@ int intersecao_cubo(ponto_t *origem_raio, vetor_t *direcao_raio, cubo_t *c, doub
  * @param num_esferas Número de esferas do array anterior.
  * 
  */
-cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, int num_objetos)
+cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, luz_t *luz, int num_objetos)
 {
     cor_t cor;
     double tperto, t0, t1;
@@ -233,7 +233,6 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, i
                 if (t0 < tperto) 
                 {
                     tperto = t0;
-                    //esf = &esferas[i];
                     cor = objetos[i].esfera->cor;
                 }
             }
@@ -249,7 +248,6 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, i
                 if (t0 < tperto) 
                 {
                     tperto = t0;
-                    //esf = &esferas[i];
                 }
             }
 

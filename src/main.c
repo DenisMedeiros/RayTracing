@@ -13,14 +13,23 @@
 #define Z_NEAR 1.0
 #define Z_FAR 20.0
 
+#define LF_X 0.0 // Look from x
+#define LF_Y 0.0 // Look from y
+#define LF_Z 5.0 // Look from z
+
+#define LA_X 0.0 // Look at x
+#define LA_Y 0.0 // Look at y
+#define LA_Z 0.0 // Look at z
+
+#define FUNDO_R 1.0
+#define FUNDO_G 1.0
+#define FUNDO_B 1.0
+ 
 /* Variáveis globais. */
-ponto_t look_from = {0.0, 0.0, 5.0};
-ponto_t look_at = {0.0, 0.0, 0.0};
 
-ponto_t posicao_luz = {-5.0, 0, 2.0};
-cor_t cor_luz = {1.0, 1.0, 0.0};
-
-objeto_t objetos[NUM_OBJETOS];
+luz_t luz; // Fonte de luz
+objeto_t objetos[NUM_OBJETOS]; // Lista de objetos
+float *pixels; // Matriz de píxels de 3 canais.
 
 void init(void) 
 {
@@ -37,14 +46,11 @@ void display(void)
     GLdouble x_near, y_near, z_near;
     GLdouble x_far, y_far, z_far;
 
-    float *pixels; // Matriz de píxels de 3 canais.
     int i, j, altura, largura;
     ponto_t origem; // Ponto de origem
     vetor_t dir; // Vetor direção.
     cor_t pixel;
-
-    pixels = NULL;
-    
+   
     glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(1.0, 1.0, 1.0);
     glPushMatrix();      
@@ -106,11 +112,20 @@ void display(void)
             //exit(0); // DEBUG: para após o primeiro
 
             // Faz o raytracing.
-            pixel = raytrace(&origem, &dir, objetos, NUM_OBJETOS);
+            pixel = raytrace(&origem, &dir, objetos, &luz, NUM_OBJETOS);
 
-            pixels[(i * largura * 3) + (j * 3) + 0] = pixel.r;
-            pixels[(i * largura * 3) + (j * 3) + 1] = pixel.g;
-            pixels[(i * largura * 3) + (j * 3) + 2] = pixel.b;    
+            if(pixel.r != -1)
+            {
+                pixels[(i * largura * 3) + (j * 3) + 0] = pixel.r;
+                pixels[(i * largura * 3) + (j * 3) + 1] = pixel.g;
+                pixels[(i * largura * 3) + (j * 3) + 2] = pixel.b;    
+            }
+            else
+            {
+                pixels[(i * largura * 3) + (j * 3) + 0] = FUNDO_R;
+                pixels[(i * largura * 3) + (j * 3) + 1] = FUNDO_G;
+                pixels[(i * largura * 3) + (j * 3) + 2] = FUNDO_B;                  
+            }
             
         }
     }
@@ -131,7 +146,7 @@ void reshape (int w, int h)
     gluPerspective(60.0, (GLfloat) w/(GLfloat) h, Z_NEAR, Z_FAR);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt (look_from.x, look_from.y, look_from.z, look_at.x, look_at.y, look_at.z, 0.0, 1.0, 0.0);
+    gluLookAt (LF_X, LF_Y, LF_Z, LA_X, LA_Y, LA_Z, 0.0, 1.0, 0.0);
 }
 
 void keyboard (unsigned char key, int x, int y)
@@ -159,37 +174,35 @@ int main(int argc, char** argv)
 {
 
     // Criação das esferas
-    ponto_t centro1, centro2;
-    cor_t cor1, cor2;
-
-    centro1.x = 1.0;
-    centro1.y = 0.0;
-    centro1.z = 0.0;
-    
-    centro2.x = -1.0;
-    centro2.y = 0.0;
-    centro2.z = 0.0;
-
-    cor1.r = 1.0;
-    cor1.g = 0.7;
-    cor1.b = 0.1;
-
-    cor2.r = 0.0;
-    cor2.g = 0.0;
-    cor2.b = 1.0;
-
     objetos[0].tipo = ESFERA;
     objetos[0].esfera = malloc(sizeof(esfera_t));
-    objetos[0].esfera->centro = centro1;
+    objetos[0].esfera->centro.x = 1.0;
+    objetos[0].esfera->centro.y = 0.0;
+    objetos[0].esfera->centro.z = 0.0;
     objetos[0].esfera->raio = 2;
-    objetos[0].esfera->cor = cor1;
-    
+    objetos[0].esfera->cor.r = 1.0;
+    objetos[0].esfera->cor.g = 1.0;
+    objetos[0].esfera->cor.b = 0.0; 
    
     objetos[1].tipo = ESFERA;
     objetos[1].esfera = malloc(sizeof(esfera_t));
-    objetos[1].esfera->centro = centro2;
-    objetos[1].esfera->raio = 3;
-    objetos[1].esfera->cor = cor2;
+    objetos[1].esfera->centro.x = -2.0;
+    objetos[1].esfera->centro.y = 1.0;
+    objetos[1].esfera->centro.z = -1.0;
+    objetos[1].esfera->raio = 1;
+    objetos[1].esfera->cor.r = 0.0;
+    objetos[1].esfera->cor.g = 0.0;
+    objetos[1].esfera->cor.b = 1.0; 
+
+    luz.posicao.x = 4;
+    luz.posicao.y = 2;
+    luz.posicao.z = 2;
+
+    luz.cor.r = 1.0;
+    luz.cor.g = 1.0;
+    luz.cor.b = 1.0;
+
+    pixels = NULL;
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
@@ -202,6 +215,7 @@ int main(int argc, char** argv)
     glutKeyboardFunc(keyboard);
     glutMainLoop();
 
+    free(pixels);
     free(objetos[0].esfera);
     free(objetos[1].esfera);
 

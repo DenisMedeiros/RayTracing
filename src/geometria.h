@@ -72,6 +72,16 @@ typedef struct {
 } objeto_t;
 
 /** 
+ * Estrutura para definir a fonte de luz.
+ * 
+ */
+typedef struct {
+    ponto_t posicao;
+    cor_t cor;
+} luz_t;
+
+
+/** 
  * Esta função faz a soma de dois vetores.
  * 
  * @param v1 Ponteiro para o primeiro vetor.
@@ -185,7 +195,7 @@ int intersecao_cubo(ponto_t *origem_raio, vetor_t *direcao_raio, cubo_t *cubo, d
  * @param num_esferas Número de esferas do array anterior.
  * 
  */
-cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, int num_objetos);
+cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, luz_t *luz, int num_objetos);
 
 
 
