@@ -1,6 +1,11 @@
 #ifndef GEOMETRIA_H
 #define GEOMETRIA_H
 
+ #define max(a,b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a > _b ? _a : _b; })
+
 /** Representa o maior valor de distância dos objetos. */
 #define INFINITO 1.0e10
 /** Valor de PI. */
@@ -29,11 +34,7 @@ typedef vetor_t ponto_t;
  * Estrutura para armazenar um cor RGB normalizada (entre 0 e 1). 
  * Ela contem as 3 componentes de R, G e B, respectivamente. 
  */
-typedef struct {
-    float r;
-    float g;
-    float b;
-} cor_t;
+typedef vetor_t cor_t;
 
 /** 
  * Estrutura para armazenar uma esfera. 
@@ -43,7 +44,6 @@ typedef struct {
 typedef struct {
     ponto_t centro;
     double raio;
-    cor_t cor;
 } esfera_t;
 
 /** 
@@ -55,7 +55,6 @@ typedef struct {
     ponto_t centro;
     vetor_t direcao_cima;
     double lado;
-    cor_t cor;
 } cubo_t;
 
 /** 
@@ -69,6 +68,8 @@ typedef struct {
         esfera_t *esfera;
         cubo_t *cubo;
     };
+	cor_t cor;
+	char refletivel;
 } objeto_t;
 
 /** 
@@ -195,7 +196,7 @@ int intersecao_cubo(ponto_t *origem_raio, vetor_t *direcao_raio, cubo_t *cubo, d
  * @param num_esferas Número de esferas do array anterior.
  * 
  */
-cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, luz_t *luz, int num_objetos);
+cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, luz_t *luz, int num_objetos, int num_reflexoes);
 
 
 

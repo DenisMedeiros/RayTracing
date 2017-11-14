@@ -24,6 +24,7 @@
 #define FUNDO_R 1.0
 #define FUNDO_G 1.0
 #define FUNDO_B 1.0
+
  
 /* Variáveis globais. */
 
@@ -112,13 +113,14 @@ void display(void)
             //exit(0); // DEBUG: para após o primeiro
 
             // Faz o raytracing.
-            pixel = raytrace(&origem, &dir, objetos, &luz, NUM_OBJETOS);
-
-            if(pixel.r != -1)
+            pixel = raytrace(&origem, &dir, objetos, &luz, NUM_OBJETOS, 0);
+			
+			// Verifica se veio alguma cor (se não, não houve insersecção.
+            if(pixel.x != -1)
             {
-                pixels[(i * largura * 3) + (j * 3) + 0] = pixel.r;
-                pixels[(i * largura * 3) + (j * 3) + 1] = pixel.g;
-                pixels[(i * largura * 3) + (j * 3) + 2] = pixel.b;    
+                pixels[(i * largura * 3) + (j * 3) + 0] = pixel.x;
+                pixels[(i * largura * 3) + (j * 3) + 1] = pixel.y;
+                pixels[(i * largura * 3) + (j * 3) + 2] = pixel.z;    
             }
             else
             {
@@ -180,27 +182,29 @@ int main(int argc, char** argv)
     objetos[0].esfera->centro.y = 0.0;
     objetos[0].esfera->centro.z = 0.0;
     objetos[0].esfera->raio = 2;
-    objetos[0].esfera->cor.r = 1.0;
-    objetos[0].esfera->cor.g = 1.0;
-    objetos[0].esfera->cor.b = 0.0; 
-   
+    objetos[0].cor.x = 1.0;
+    objetos[0].cor.y = 1.0;
+    objetos[0].cor.z = 0.0; 
+	objetos[0].refletivel = 1;
+	
     objetos[1].tipo = ESFERA;
     objetos[1].esfera = malloc(sizeof(esfera_t));
     objetos[1].esfera->centro.x = -2.0;
     objetos[1].esfera->centro.y = 1.0;
     objetos[1].esfera->centro.z = -1.0;
     objetos[1].esfera->raio = 1;
-    objetos[1].esfera->cor.r = 0.0;
-    objetos[1].esfera->cor.g = 0.0;
-    objetos[1].esfera->cor.b = 1.0; 
-
+    objetos[1].cor.x = 0.0;
+    objetos[1].cor.y = 0.0;
+    objetos[1].cor.z = 1.0;
+    objetos[1].refletivel = 1; 
+	
     luz.posicao.x = 4;
     luz.posicao.y = 2;
     luz.posicao.z = 2;
 
-    luz.cor.r = 1.0;
-    luz.cor.g = 1.0;
-    luz.cor.b = 1.0;
+    luz.cor.x = 1.0;
+    luz.cor.y = 1.0;
+    luz.cor.z = 1.0;
 
     pixels = NULL;
 

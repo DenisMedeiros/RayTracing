@@ -1,6 +1,6 @@
 #include "geometria.h"
-#include "math.h"
-
+#include <math.h>
+#include <stdio.h>
 /** 
  * Esta função faz a soma de dois vetores.
  * 
@@ -202,20 +202,28 @@ int intersecao_cubo(ponto_t *origem_raio, vetor_t *direcao_raio, cubo_t *c, doub
  * @param num_esferas Número de esferas do array anterior.
  * 
  */
-cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, luz_t *luz, int num_objetos)
+cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, luz_t *luz, int num_objetos, int num_recursoes)
 {
     cor_t cor;
     double tperto, t0, t1;
-    int i;
+    int i, j, luz_direta;
+	objeto_t *objeto_perto;
+	vetor_t normal, refletido, temp, direcao_luz;
+	ponto_t ponto_intersec;
+	
+	vetor_t temp2;
+	float t4;
+	vetor_t temp3;
  
+	objeto_perto = 0;
     tperto = INFINITO; 
 
     /* Se não tocar nenhum objeto, então a cor será negativa. */
-    cor.r = -1.0;
-    cor.g = -1.0;
-    cor.b = -1.0;
+    cor.x = -1.0;
+    cor.y = -1.0;
+    cor.z = -1.0;
     
-    /* Encontra a interseção do raio com uma esfera da cena. */
+    /* Encontra o objeto mais perto da câmera (caso exista). */
     for (i = 0; i < num_objetos; ++i) 
     {
         t0 = INFINITO; 
@@ -224,40 +232,108 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, l
         switch(objetos[i].tipo)
         {
         case ESFERA:
-            if (intersecao_esfera(origem_raio, direcao_raio, objetos[i].esfera, &t0, &t1)) 
-            {
-                if (t0 < 0)
-                { 
-                    t0 = t1;
-                }
-                if (t0 < tperto) 
-                {
-                    tperto = t0;
-                    cor = objetos[i].esfera->cor;
-                }
-            }
-            break;  
-
+            intersecao_esfera(origem_raio, direcao_raio, objetos[i].esfera, &t0, &t1);
+			break;
         case CUBO:
-            if (intersecao_cubo(origem_raio, direcao_raio, objetos[i].cubo, &t0, &t1)) 
-            {
-                if (t0 < 0)
-                { 
-                    t0 = t1;
-                }
-                if (t0 < tperto) 
-                {
-                    tperto = t0;
-                }
-            }
-
-
+            intersecao_cubo(origem_raio, direcao_raio, objetos[i].cubo, &t0, &t1);
             break;
         default:
             break;
         }
+        
+        if(t0 == INFINITO)
+        {
+			continue;
+		}
+        
+		if (t0 < 0)
+		{ 
+			t0 = t1;
+		}
+		
+		if (t0 < tperto) 
+		{
+			tperto = t0;
+			objeto_perto = &objetos[i];
+		}
 
     }
-       
+    
+    // Verifica se algum objeto não foi intersectado.
+    if(objeto_perto == 0)
+    {
+		return cor;
+	}
+	
+	// Pega a cor...
+	switch(objeto_perto->tipo)
+    {
+    case ESFERA:
+		temp = mult_e(direcao_raio, tperto);
+		ponto_intersec = soma_v(origem_raio, &temp);
+		normal = sub_v(&ponto_intersec, &objeto_perto->esfera->centro);
+		normal = normalizar(&normal);
+		
+		if(prod_e(direcao_raio, &normal) > 0)
+		{
+			normal = neg_v(&normal);
+		}
+		
+		if(objeto_perto->refletivel && num_recursoes < MAX_REC)
+		{
+			
+			temp = mult_e(&normal, 2 * prod_e(direcao_raio, &normal));
+			refletido = sub_v(direcao_raio, &temp);
+			refletido = normalizar(&refletido);	
+			cor = raytrace(&ponto_intersec, &normal, objetos, luz, num_objetos, num_recursoes + 1);
+		}
+		else // Calculo da luz
+		{
+			
+			direcao_luz = sub_v(&luz->posicao, &ponto_intersec);
+			direcao_luz = normalizar(&direcao_luz);
+			luz_direta = 1;
+			// Percore os demais objetos para ver se há algum na frente.
+			for(j = 0; j < num_objetos; j++)
+			{
+				switch(objetos[j].tipo)
+				{
+				case ESFERA:
+					if(intersecao_esfera(&ponto_intersec, &direcao_luz, objetos[j].esfera, &t0, &t1))
+					{
+						luz_direta = 0;
+					}
+					break;
+				case CUBO:
+					intersecao_cubo(&ponto_intersec, &direcao_luz, objetos[j].cubo, &t0, &t1);
+					{
+						luz_direta = 0;
+					}
+					break;
+				default:
+					break;
+				}
+				
+				if(!luz_direta)
+				{
+					break;
+				}
+			}
+			
+			temp2 = mult_e(&objeto_perto->cor, luz_direta);
+			t4 = max(0.0f, prod_e(&normal, &direcao_luz));
+			temp3 = mult_e(&temp2, t4);
+			
+			cor = mult_v(&temp3, &luz->cor);
+			
+		}
+			
+		break;
+	case CUBO:
+		break;
+	default:
+		break;
+	}
+      
     return cor;
 }
