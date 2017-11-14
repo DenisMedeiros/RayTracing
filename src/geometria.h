@@ -53,6 +53,7 @@ typedef struct {
  */
 typedef struct {
     ponto_t centro;
+    vetor_t direcao_cima;
     double lado;
     cor_t cor;
 } cubo_t;

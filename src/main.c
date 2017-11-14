@@ -11,6 +11,9 @@
 
 objeto_t objetos[NUM_OBJETOS];
 
+ponto_t look_from = {0.0, 0.0, 5.0};
+ponto_t look_at = {0.0, 0.0, 0.0};
+
 float *pixels;
 
 void init(void) 
@@ -56,13 +59,15 @@ void display(void)
     // Define os pontos na tela.
     win_x = 0;
     win_y = 0;
+
+
     
     for(i = 0; i < altura; i++) // Percorre as linhas (altura)
     {
         for(j = 0; j < largura; j++) // Percorre as colunas (largura)
         {
-            win_x = i;
-            win_y = j;
+            win_x = j;
+            win_y = i;
             
             // Subtrai y a altura da janela.
             //win_y = altura - win_y;
@@ -70,7 +75,7 @@ void display(void)
             // Obtém o ponto no plano near.
             gluUnProject(win_x, win_y, 0.0, model_view, projection, view_port, &x_near, &y_near, &z_near);
             
-            // Obtém o ponto no plano near.
+            // Obtém o ponto no plano far.
             gluUnProject(win_x, win_y, 1.0, model_view, projection, view_port, &x_far, &y_far, &z_far);
             
             // Cria o vetor origem
@@ -82,30 +87,34 @@ void display(void)
             dir.x = x_far - x_near;
             dir.y = y_far - y_near;
             dir.z = z_far - z_near;
-            
+
             // Normaliza o vetor direção.
-            //dir = normalizar(&dir);
+            dir = normalizar(&dir);
             
             //printf("Ponto origem: (%lf, %lf, %lf)\n", (double) x_near, (double) y_near, (double) z_near);
+            //printf("Ponto final: (%lf, %lf, %lf)\n", (double) x_far, (double) y_far, (double) z_far);
             //printf("Vetor direção: (%lf, %lf, %lf)\n", (double) dir.x, (double) dir.y, (double) dir.z);
             //exit(0); // DEBUG: para após o primeiro
-            
+
             // Faz o raytracing.
             pixel = raytrace(&origem, &dir, objetos, NUM_OBJETOS);
-            
-            pixel.r = 0.1 + 0.001 * j;
-            pixel.g = 0.2 + 0.002 * i;
-            pixel.b = 0.9;
-            
-            // Preenche a matriz de pixels.
+
             pixels[(i * largura * 3) + (j * 3) + 0] = pixel.r;
             pixels[(i * largura * 3) + (j * 3) + 1] = pixel.g;
-            pixels[(i * largura * 3) + (j * 3) + 2] = pixel.b; 
+            pixels[(i * largura * 3) + (j * 3) + 2] = pixel.b;    
+            
+
+            
+
         
         }
     }
+
     
     glDrawPixels(view_port[2], view_port[3], GL_RGB, GL_FLOAT, pixels);
+
+            
+
         
     glPopMatrix();
     glutSwapBuffers();
@@ -151,17 +160,17 @@ int main(int argc, char** argv)
     ponto_t centro1, centro2;
     cor_t cor1, cor2;
 
-    centro1.x = 10;
-    centro1.y = 10;
-    centro1.z = 10;
+    centro1.x = 1.0;
+    centro1.y = 0.0;
+    centro1.z = 0.0;
     
-    centro2.x = 10;
-    centro2.y = 20;
-    centro2.z = 20;
+    centro2.x = -1.0;
+    centro2.y = 0.0;
+    centro2.z = 0.0;
 
     cor1.r = 1.0;
-    cor1.g = 0.0;
-    cor1.b = 0.0;
+    cor1.g = 0.7;
+    cor1.b = 0.1;
 
     cor2.r = 0.0;
     cor2.g = 0.0;
@@ -172,18 +181,20 @@ int main(int argc, char** argv)
     objetos[0].esfera->centro = centro1;
     objetos[0].esfera->raio = 2;
     objetos[0].esfera->cor = cor1;
+    
    
     objetos[1].tipo = ESFERA;
     objetos[1].esfera = malloc(sizeof(esfera_t));
     objetos[1].esfera->centro = centro2;
-    objetos[1].esfera->raio = 2;
+    objetos[1].esfera->raio = 3;
     objetos[1].esfera->cor = cor2;
+
 
     pixels = NULL;
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-    glutInitWindowSize(640, 480); 
+    glutInitWindowSize(100, 100); 
     glutInitWindowPosition (100, 100);
     glutCreateWindow (argv[0]);
     init();
