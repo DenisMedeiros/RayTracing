@@ -6,7 +6,7 @@
 
 /* Configurações básicas. */
 
-#define NUM_ESFERAS 3
+#define NUM_ESFERAS 4
 #define NUM_CUBOS 0
 #define NUM_OBJETOS (NUM_ESFERAS + NUM_CUBOS)
 
@@ -25,7 +25,7 @@
 #define FUNDO_G 1.0
 #define FUNDO_B 1.0
 
-#define MAX_REC 1
+#define MAX_REC 10
  
 /* Variáveis globais. */
 
@@ -168,6 +168,30 @@ void keyboard (unsigned char key, int x, int y)
             glRotatef(15.0, 0.0, 0.0, 1.0);
             glutPostRedisplay();
             break;
+        case 'i':
+            luz.posicao.x -= 0.1;    
+            glutPostRedisplay();
+            break;
+        case 'o':
+            luz.posicao.y -= 0.1;  
+            glutPostRedisplay();
+            break;
+        case 'p':
+            luz.posicao.z -= 0.1;     
+            glutPostRedisplay();
+            break;
+        case 'j':
+            luz.posicao.x -= 0.1;     
+            glutPostRedisplay();
+            break;
+        case 'k':
+            luz.posicao.y -= 0.1;   
+            glutPostRedisplay();
+            break;
+        case 'l':
+            luz.posicao.z -= 0.1;      
+            glutPostRedisplay();
+            break;
         default:
             break;
     }
@@ -192,7 +216,7 @@ int main(int argc, char** argv)
     objetos[1].esfera = malloc(sizeof(esfera_t));
     objetos[1].esfera->centro.x = -2.0;
     objetos[1].esfera->centro.y = 0.0;
-    objetos[1].esfera->centro.z = 0.0;
+    objetos[1].esfera->centro.z = 1.0;
     objetos[1].esfera->raio = 1;
     objetos[1].cor.x = 0.0;
     objetos[1].cor.y = 0.0;
@@ -203,16 +227,27 @@ int main(int argc, char** argv)
     objetos[2].esfera = malloc(sizeof(esfera_t));
     objetos[2].esfera->centro.x = 0.0;
     objetos[2].esfera->centro.y = -2.0;
-    objetos[2].esfera->centro.z = 0.0;
+    objetos[2].esfera->centro.z = -1.0;
     objetos[2].esfera->raio = 1;
     objetos[2].cor.x = 0.0;
     objetos[2].cor.y = 1.0;
     objetos[2].cor.z = 0.0;
     objetos[2].refletivel = 1; 
+
+    objetos[3].tipo = ESFERA;
+    objetos[3].esfera = malloc(sizeof(esfera_t));
+    objetos[3].esfera->centro.x = 0.0;
+    objetos[3].esfera->centro.y = 2.0;
+    objetos[3].esfera->centro.z = 0.0;
+    objetos[3].esfera->raio = 1;
+    objetos[3].cor.x = 1.0;
+    objetos[3].cor.y = 1.0;
+    objetos[3].cor.z = 0.0;
+    objetos[3].refletivel = 1; 
 	
-    luz.posicao.x = 2;
-    luz.posicao.y = 2;
-    luz.posicao.z = 2;
+    luz.posicao.x = 0;
+    luz.posicao.y = 0;
+    luz.posicao.z = 10;
 
     luz.cor.x = 1.0;
     luz.cor.y = 1.0;
@@ -234,6 +269,7 @@ int main(int argc, char** argv)
     free(pixels);
     free(objetos[0].esfera);
     free(objetos[1].esfera);
-
+    free(objetos[2].esfera);
+    free(objetos[3].esfera);
     return 0;
 }

@@ -293,8 +293,27 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, l
 			refletido = normalizar(&refletido);	
 
 			cor_reflexao = raytrace(&ponto_intersec, &refletido, objetos, luz, num_objetos, num_recursoes + 1, max_recursoes);
-            //cor = soma_v(&cor, &objeto_perto->cor);
 
+            if(cor_reflexao.x == -1)
+            {
+                // Calcula a direção do vetor que sai do ponto até a fonte de luz.
+			    direcao_luz = sub_v(&luz->posicao, &ponto_intersec);
+			    direcao_luz = normalizar(&direcao_luz);
+
+			    temp4_f = max(0.0f, prod_e(&normal, &direcao_luz)); // Entre 0 e 1
+			    temp3_v = mult_e(&objeto_perto->cor, temp4_f); // Multiplica cor por esse fator (um peso entre 0 e 1)
+			    cor = mult_v(&temp3_v, &luz->cor);         
+            }
+            else
+            {
+                temp1_v = mult_e(&objeto_perto->cor, 0.7);
+                temp2_v = mult_e(&cor_reflexao, 0.3);
+                cor = soma_v(&temp1_v, &temp2_v);
+
+                cor = mult_e(&cor_reflexao, brilho(&objeto_perto->cor));
+                
+                //cor = mult_v(&cor_reflexao, &objeto_perto->cor);
+            }
 		}
 		else // Calculo da cor em fução da luz.
 		{
@@ -346,4 +365,10 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, l
       
     return cor;
     
+}
+
+
+float brilho(cor_t *cor)
+{
+    return (cor->x + cor->y + cor->z)/3.0;
 }

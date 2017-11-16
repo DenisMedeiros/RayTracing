@@ -197,6 +197,8 @@ int intersecao_cubo(ponto_t *origem_raio, vetor_t *direcao_raio, cubo_t *cubo, d
 cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, luz_t *luz, int num_objetos, int num_reflexoes, int max_recursoes);
 
 
+float brilho(cor_t *cor);
+
 
 #endif // GEOMETRIA_H
 
