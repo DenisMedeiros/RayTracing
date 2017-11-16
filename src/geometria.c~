@@ -204,7 +204,7 @@ int intersecao_cubo(ponto_t *origem_raio, vetor_t *direcao_raio, cubo_t *c, doub
  */
 cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, luz_t *luz, int num_objetos, int num_recursoes, int max_recursoes)
 {
-    cor_t cor, cor_reflexao;
+    cor_t cor;
     double tperto, t0, t1;
     int i, j, luz_direta;
 	objeto_t *objeto_perto;

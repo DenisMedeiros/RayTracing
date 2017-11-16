@@ -25,7 +25,7 @@
 #define FUNDO_G 1.0
 #define FUNDO_B 1.0
 
-#define MAX_REC 1
+#define MAX_REC 0
  
 /* Variáveis globais. */
 
