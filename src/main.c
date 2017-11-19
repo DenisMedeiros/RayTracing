@@ -25,18 +25,40 @@
 #define FUNDO_G 1.0
 #define FUNDO_B 1.0
 
-#define MAX_REC 10
+#define MAX_REC 0
+
+/* Configurações da animação. */
+
+//#define GERAR_ANIMACAO
+//#define SCREEN_FPS 24
  
 /* Variáveis globais. */
-
 luz_t luz; // Fonte de luz
 objeto_t objetos[NUM_OBJETOS]; // Lista de objetos
 float *pixels; // Matriz de píxels de 3 canais.
+int altura, largura;
+
+
+
+#ifdef GERAR_ANIMACAO
+/** Função que faz as mudanças da animação. */
+void loop(int x)
+{ 
+    glRotatef(-5.0, 1.0, 0.0, 0.0);
+    glRotatef(6.0, 0.0, 1.0, 0.0);
+    glRotatef(-7.0, 0.0, 0.0, 1.0);
+    glutPostRedisplay();
+    glutTimerFunc(1000 / SCREEN_FPS, loop, 0); // Configura o timer novamente.
+}
+#endif
 
 void init(void) 
 {
     glClearColor(1.0, 1.0, 1.0, 0.0);
     glShadeModel(GL_SMOOTH);
+#ifdef GERAR_ANIMACAO
+    glutTimerFunc(1000 / SCREEN_FPS, loop, 0);
+#endif
 }
 
 void display(void)
@@ -48,7 +70,7 @@ void display(void)
     GLdouble x_near, y_near, z_near;
     GLdouble x_far, y_far, z_far;
 
-    int i, j, altura, largura;
+    int i, j, nova_largura, nova_altura;
     ponto_t origem; // Ponto de origem
     vetor_t dir; // Vetor direção.
     cor_t pixel;
@@ -62,32 +84,37 @@ void display(void)
     glGetDoublev(GL_MODELVIEW_MATRIX, model_view); 
     glGetDoublev(GL_PROJECTION_MATRIX, projection);
     
-    largura = view_port[2];
-    altura = view_port[3];
+    nova_largura = view_port[2];
+    nova_altura = view_port[3];
     
-    if(pixels != NULL)
+    // Verifica se a janela mudou de tamanho.
+    if(nova_largura != largura || nova_altura != altura)
     {
-        free(pixels);
-        pixels = NULL;
+        printf("mudou");
+        
+        altura = nova_altura;
+        largura = nova_largura;
+        
+        if(pixels != NULL)
+        {
+            free(pixels);
+            pixels = NULL;
+        }
+        
+        pixels = (float *) malloc(altura * largura * 3 * sizeof(float));
     }
-    
-    pixels = (float *) malloc(altura * largura * 3 * sizeof(float));
     
     // Define os pontos na tela.
     win_x = 0;
     win_y = 0;
 
 
-    
     for(i = 0; i < altura; i++) // Percorre as linhas (altura)
     {
         for(j = 0; j < largura; j++) // Percorre as colunas (largura)
         {
             win_x = j;
             win_y = i;
-            
-            // Subtrai y a altura da janela.
-            //win_y = altura - win_y;
             
             // Obtém o ponto no plano near.
             gluUnProject(win_x, win_y, 0.0, model_view, projection, view_port, &x_near, &y_near, &z_near);
@@ -108,11 +135,6 @@ void display(void)
             // Normaliza o vetor direção.
             dir = normalizar(&dir);
             
-            //printf("Ponto origem: (%lf, %lf, %lf)\n", (double) x_near, (double) y_near, (double) z_near);
-            //printf("Ponto final: (%lf, %lf, %lf)\n", (double) x_far, (double) y_far, (double) z_far);
-            //printf("Vetor direção: (%lf, %lf, %lf)\n", (double) dir.x, (double) dir.y, (double) dir.z);
-            //exit(0); // DEBUG: para após o primeiro
-
             // Faz o raytracing.
             pixel = raytrace(&origem, &dir, objetos, &luz, NUM_OBJETOS, 0, MAX_REC);
 			
@@ -139,6 +161,9 @@ void display(void)
     glPopMatrix();
     glutSwapBuffers();
     glutSwapBuffers();
+    
+    
+    
 }
 
 void reshape (int w, int h)
@@ -252,12 +277,15 @@ int main(int argc, char** argv)
     luz.cor.x = 1.0;
     luz.cor.y = 1.0;
     luz.cor.z = 1.0;
+    
+    largura = 400;
+    altura = 400;
 
-    pixels = NULL;
+    pixels = (float *) malloc(altura * largura * 3 * sizeof(float));
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-    glutInitWindowSize(100, 100); 
+    glutInitWindowSize(largura, altura); 
     glutInitWindowPosition (100, 100);
     glutCreateWindow (argv[0]);
     init();
