@@ -48,12 +48,23 @@ typedef struct {
  * Estrutura para armazenar um cubo. 
  * 
  * Para ser representado, a esfera precisa de um centro e do tamanho do lado.
+ * Os vértices devem ser fornecidos iniciando de cima para baixo, depois esquerda
+ * para direita e por fim da frente para trás.
+ * 
  */
 typedef struct {
-    ponto_t centro;
-    vetor_t direcao_cima;
-    double lado;
+    ponto_t vertices[8];
 } cubo_t;
+
+/** 
+ * Estrutura para armazenar um triangulo. 
+ * 
+ * 
+ */
+typedef struct {
+    ponto_t vertices[3];
+} triangulo_t;
+
 
 /** 
  * Estrutura para armazenar um objeto (pode ser esfera ou cubo).

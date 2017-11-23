@@ -25,20 +25,21 @@
 #define FUNDO_G 1.0
 #define FUNDO_B 1.0
 
+#define PASSO_PAN 0.1 // Em metros
+#define PASSO_GIRO 15 // 15°
+
 #define MAX_REC 0
 
 /* Configurações da animação. */
 
-//#define GERAR_ANIMACAO
-//#define SCREEN_FPS 24
+#define GERAR_ANIMACAO
+#define SCREEN_FPS 24
  
 /* Variáveis globais. */
 luz_t luz; // Fonte de luz
 objeto_t objetos[NUM_OBJETOS]; // Lista de objetos
 float *pixels; // Matriz de píxels de 3 canais.
 int altura, largura;
-
-
 
 #ifdef GERAR_ANIMACAO
 /** Função que faz as mudanças da animação. */
@@ -74,11 +75,13 @@ void display(void)
     ponto_t origem; // Ponto de origem
     vetor_t dir; // Vetor direção.
     cor_t pixel;
+    
+    
    
     glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(1.0, 1.0, 1.0);
-    glPushMatrix();      
-    
+    glPushMatrix();    
+        
     // Fazendo a rasterização.
     glGetIntegerv(GL_VIEWPORT, view_port); // Obtém x, y, largura e altura.
     glGetDoublev(GL_MODELVIEW_MATRIX, model_view); 
@@ -88,10 +91,8 @@ void display(void)
     nova_altura = view_port[3];
     
     // Verifica se a janela mudou de tamanho.
-    if(nova_largura != largura || nova_altura != altura)
+    if(nova_largura != largura || nova_altura != altura)       
     {
-        printf("mudou");
-        
         altura = nova_altura;
         largura = nova_largura;
         
@@ -181,45 +182,39 @@ void keyboard (unsigned char key, int x, int y)
 {
     switch (key) 
     {
-        case 'x':
-            glRotatef(15.0, 1.0, 0.0, 0.0);
-            glutPostRedisplay();
-            break;
-        case 'y':
-            glRotatef(15.0, 0.0, 1.0, 0.0);
-            glutPostRedisplay();
-            break;
-        case 'z':
-            glRotatef(15.0, 0.0, 0.0, 1.0);
-            glutPostRedisplay();
-            break;
-        case 'i':
-            luz.posicao.x -= 0.1;    
-            glutPostRedisplay();
-            break;
-        case 'o':
-            luz.posicao.y -= 0.1;  
-            glutPostRedisplay();
-            break;
-        case 'p':
-            luz.posicao.z -= 0.1;     
-            glutPostRedisplay();
-            break;
-        case 'j':
-            luz.posicao.x -= 0.1;     
-            glutPostRedisplay();
-            break;
-        case 'k':
-            luz.posicao.y -= 0.1;   
-            glutPostRedisplay();
-            break;
-        case 'l':
-            luz.posicao.z -= 0.1;      
-            glutPostRedisplay();
-            break;
-        default:
-            break;
+    case 'a':
+        glTranslatef(-PASSO_PAN, 0, 0);
+        break;
+    case 'd':
+        glTranslatef(PASSO_PAN, 0, 0);
+        break;
+    case 's':
+        glTranslatef(0, -PASSO_PAN, 0);
+        break;
+    case 'w':
+        glTranslatef(0, PASSO_PAN, 0);
+        break; 
+    case 'o':
+        glTranslatef(0, 0, -PASSO_PAN);
+        break;
+    case 'p':
+        glTranslatef(0, 0, PASSO_PAN);
+        break;         
+    case 'j':
+        glRotatef(PASSO_GIRO, 1.0, 0.0, 0.0);
+        break;
+    case 'k':
+        glRotatef(PASSO_GIRO, 0.0, 1.0, 0.0);
+        break;    
+    case 'l':
+        glRotatef(PASSO_GIRO, 0.0, 0.0, 1.0);
+        break;    
+    default:
+        break;
     }
+         
+    glutPostRedisplay();
+
 }
 
 int main(int argc, char** argv)

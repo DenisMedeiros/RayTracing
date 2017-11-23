@@ -185,9 +185,62 @@ int intersecao_esfera(ponto_t *origem_raio, vetor_t *direcao_raio, esfera_t *esf
  * origem e o segundo ponto de interseção (é modificada na função).
  * @return 1 se o raio intersecta o cubo, 0 caso contrário.
  */ 
-int intersecao_cubo(ponto_t *origem_raio, vetor_t *direcao_raio, cubo_t *c, double *t0, double *t1)
+int intersecao_cubo(ponto_t *origem_raio, vetor_t *direcao_raio, cubo_t *cubo, double *t0, double *t1)
 {
-    // TODO
+    
+    vetor_t distancia;
+    
+    // Construindo os triângulos
+    triangulo_t triangulos[12];
+    
+    triangulos[0].vertices[0] = cubo->vertices[0];
+    triangulos[0].vertices[1] = cubo->vertices[1];
+    triangulos[0].vertices[2] = cubo->vertices[3];
+    
+    triangulos[1].vertices[0] = cubo->vertices[0];
+    triangulos[1].vertices[1] = cubo->vertices[2];
+    triangulos[1].vertices[2] = cubo->vertices[3];
+    
+    triangulos[2].vertices[0] = cubo->vertices[0];
+    triangulos[2].vertices[1] = cubo->vertices[2];
+    triangulos[2].vertices[2] = cubo->vertices[4];
+    
+    triangulos[3].vertices[0] = cubo->vertices[2];
+    triangulos[3].vertices[1] = cubo->vertices[4];
+    triangulos[3].vertices[2] = cubo->vertices[6];
+    
+    triangulos[4].vertices[0] = cubo->vertices[4];
+    triangulos[4].vertices[1] = cubo->vertices[5];
+    triangulos[4].vertices[2] = cubo->vertices[6];
+    
+    triangulos[5].vertices[0] = cubo->vertices[5];
+    triangulos[5].vertices[1] = cubo->vertices[6];
+    triangulos[5].vertices[2] = cubo->vertices[7];
+    
+    triangulos[6].vertices[0] = cubo->vertices[1];
+    triangulos[6].vertices[1] = cubo->vertices[3];
+    triangulos[6].vertices[2] = cubo->vertices[5];
+    
+    triangulos[7].vertices[0] = cubo->vertices[3];
+    triangulos[7].vertices[1] = cubo->vertices[5];
+    triangulos[7].vertices[2] = cubo->vertices[7];
+    
+    triangulos[8].vertices[0] = cubo->vertices[2];
+    triangulos[8].vertices[1] = cubo->vertices[3];
+    triangulos[8].vertices[2] = cubo->vertices[7];
+    
+    triangulos[9].vertices[0] = cubo->vertices[2];
+    triangulos[9].vertices[1] = cubo->vertices[6];
+    triangulos[9].vertices[2] = cubo->vertices[7];
+    
+    triangulos[10].vertices[0] = cubo->vertices[0];
+    triangulos[10].vertices[1] = cubo->vertices[4];
+    triangulos[10].vertices[2] = cubo->vertices[5];
+    
+    triangulos[11].vertices[0] = cubo->vertices[0];
+    triangulos[11].vertices[1] = cubo->vertices[1];
+    triangulos[11].vertices[2] = cubo->vertices[5];
+    
     return 0;
 }
 
@@ -207,15 +260,15 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, l
     cor_t cor, cor_reflexao;
     double tperto, t0, t1;
     int i, j, luz_direta;
-	objeto_t *objeto_perto;
-	vetor_t normal, refletido, direcao_luz;
-	ponto_t ponto_intersec;
-	
+    objeto_t *objeto_perto;
+    vetor_t normal, refletido, direcao_luz;
+    ponto_t ponto_intersec;
+    
     // Variáveis auxiliares paras as funções vetoriais
-	vetor_t temp1_v, temp2_v, temp3_v;
+    vetor_t temp1_v, temp2_v, temp3_v;
     float temp4_f;
  
-	objeto_perto = 0;
+    objeto_perto = 0;
     tperto = INFINITO; 
 
     /* Se não tocar nenhum objeto, então a cor será negativa. */
@@ -233,7 +286,7 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, l
         {
         case ESFERA:
             intersecao_esfera(origem_raio, direcao_raio, objetos[i].esfera, &t0, &t1);
-			break;
+            break;
         case CUBO:
             intersecao_cubo(origem_raio, direcao_raio, objetos[i].cubo, &t0, &t1);
             break;
@@ -243,66 +296,66 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, l
         
         if(t0 == INFINITO)
         {
-			continue;
-		}
+            continue;
+        }
         
-		if (t0 < 0) // Caso o raio tenha intersectado a borda.
-		{ 
-			t0 = t1;
-		}
-		
-		if (t0 < tperto)
-		{
-			tperto = t0;
-			objeto_perto = &objetos[i];
-		}
+        if (t0 < 0) // Caso o raio tenha intersectado a borda.
+        { 
+            t0 = t1;
+        }
+        
+        if (t0 < tperto)
+        {
+            tperto = t0;
+            objeto_perto = &objetos[i];
+        }
 
     }
     
     // Verifica se algum objeto não foi intersectado.
     if(objeto_perto == 0)
     {
-		return cor;
-	}
-	
-	// Parte para determinar a cor do pixel com base na iluminação.
-	switch(objeto_perto->tipo)
+        return cor;
+    }
+    
+    // Parte para determinar a cor do pixel com base na iluminação.
+    switch(objeto_perto->tipo)
     {
     case ESFERA:
         
         // Calcula o ponto de intersecção do raio e da esfera.
-		temp1_v = mult_e(direcao_raio, tperto);
-		ponto_intersec = soma_v(origem_raio, &temp1_v);
+        temp1_v = mult_e(direcao_raio, tperto);
+        ponto_intersec = soma_v(origem_raio, &temp1_v);
         
         // Calcula o vetor normal e normaliza-o.
-		normal = sub_v(&ponto_intersec, &objeto_perto->esfera->centro);
-		normal = normalizar(&normal);
+        normal = sub_v(&ponto_intersec, &objeto_perto->esfera->centro);
+        normal = normalizar(&normal);
         
         // Inverte o sentido da normal caso ela esteja dentro da esfera.
-	    if(prod_e(direcao_raio, &normal) > 0)
-	    {
-			    normal = neg_v(&normal);
+        if(prod_e(direcao_raio, &normal) > 0)
+        {
+                normal = neg_v(&normal);
         }
-		
+        
         // Parte recursiva do raytracing.
-		if(objeto_perto->refletivel && num_recursoes < max_recursoes)
-		{
-			// Calcula a direção do raio refletido e normaliza-o.
-			temp1_v = mult_e(&normal, 2 * prod_e(direcao_raio, &normal));
-			refletido = sub_v(direcao_raio, &temp1_v);
-			refletido = normalizar(&refletido);	
+        if(objeto_perto->refletivel && num_recursoes < max_recursoes)
+        {
+            // Calcula a direção do raio refletido e normaliza-o.
+            temp1_v = mult_e(&normal, 2 * prod_e(direcao_raio, &normal));
+            refletido = sub_v(direcao_raio, &temp1_v);
+            refletido = normalizar(&refletido);    
 
-			cor_reflexao = raytrace(&ponto_intersec, &refletido, objetos, luz, num_objetos, num_recursoes + 1, max_recursoes);
+            cor_reflexao = raytrace(&ponto_intersec, &refletido, objetos, luz, num_objetos, num_recursoes + 1, max_recursoes);
 
             if(cor_reflexao.x == -1)
             {
                 // Calcula a direção do vetor que sai do ponto até a fonte de luz.
-			    direcao_luz = sub_v(&luz->posicao, &ponto_intersec);
-			    direcao_luz = normalizar(&direcao_luz);
+                direcao_luz = sub_v(&luz->posicao, &ponto_intersec);
+                direcao_luz = normalizar(&direcao_luz);
 
-			    temp4_f = max(0.0f, prod_e(&normal, &direcao_luz)); // Entre 0 e 1
-			    temp3_v = mult_e(&objeto_perto->cor, temp4_f); // Multiplica cor por esse fator (um peso entre 0 e 1)
-			    cor = mult_v(&temp3_v, &luz->cor);         
+                temp4_f = max(0.0f, prod_e(&normal, &direcao_luz)); // Entre 0 e 1
+                temp3_v = mult_e(&objeto_perto->cor, temp4_f); // Multiplica cor por esse fator (um peso entre 0 e 1)
+                cor = mult_v(&temp3_v, &luz->cor);         
             }
             else
             {
@@ -314,54 +367,54 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, l
                 
                 //cor = mult_v(&cor_reflexao, &objeto_perto->cor);
             }
-		}
-		else // Calculo da cor em fução da luz.
-		{
+        }
+        else // Calculo da cor em fução da luz.
+        {
             // Calcula a direção do vetor que sai do ponto até a fonte de luz.
-			direcao_luz = sub_v(&luz->posicao, &ponto_intersec);
-			direcao_luz = normalizar(&direcao_luz);
-			
-			// Percore os demais objetos para ver se há algum na frente.
+            direcao_luz = sub_v(&luz->posicao, &ponto_intersec);
+            direcao_luz = normalizar(&direcao_luz);
+            
+            // Percore os demais objetos para ver se há algum na frente.
             luz_direta = 1;
-			for(j = 0; j < num_objetos; j++)
-			{
-				switch(objetos[j].tipo)
-				{
-				case ESFERA:
-					if(intersecao_esfera(&ponto_intersec, &direcao_luz, objetos[j].esfera, &t0, &t1))
-					{
-						luz_direta = 0;
-					}
-					break;
-				case CUBO:
-					intersecao_cubo(&ponto_intersec, &direcao_luz, objetos[j].cubo, &t0, &t1);
-					{
-						luz_direta = 0;
-					}
-					break;
-				default:
-					break;
-				}
-				
-				if(!luz_direta)
-				{
-					break;
-				}
-			}
-			
-			temp2_v = mult_e(&objeto_perto->cor, luz_direta); // Cor do objeto ou sombra
-			temp4_f = max(0.0f, prod_e(&normal, &direcao_luz)); // Entre 0 e 1
-			temp3_v = mult_e(&temp2_v, temp4_f); // Multiplica cor por esse fator (um peso entre 0 e 1)
-			cor = mult_v(&temp3_v, &luz->cor);
-			
-		}
-			
-		break;
-	case CUBO:
-		break;
-	default:
-		break;
-	}
+            for(j = 0; j < num_objetos; j++)
+            {
+                switch(objetos[j].tipo)
+                {
+                case ESFERA:
+                    if(intersecao_esfera(&ponto_intersec, &direcao_luz, objetos[j].esfera, &t0, &t1))
+                    {
+                        luz_direta = 0;
+                    }
+                    break;
+                case CUBO:
+                    intersecao_cubo(&ponto_intersec, &direcao_luz, objetos[j].cubo, &t0, &t1);
+                    {
+                        luz_direta = 0;
+                    }
+                    break;
+                default:
+                    break;
+                }
+                
+                if(!luz_direta)
+                {
+                    break;
+                }
+            }
+            
+            temp2_v = mult_e(&objeto_perto->cor, luz_direta); // Cor do objeto ou sombra
+            temp4_f = max(0.0f, prod_e(&normal, &direcao_luz)); // Entre 0 e 1
+            temp3_v = mult_e(&temp2_v, temp4_f); // Multiplica cor por esse fator (um peso entre 0 e 1)
+            cor = mult_v(&temp3_v, &luz->cor);
+            
+        }
+            
+        break;
+    case CUBO:
+        break;
+    default:
+        break;
+    }
       
     return cor;
     
