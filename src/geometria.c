@@ -204,6 +204,8 @@ int intersecao_esfera(ponto_t *origem_raio, vetor_t *direcao_raio, esfera_t *esf
  * @return 1 se o raio intersecta o piramide, 0 caso contrário.
  */ 
  
+// fiz uma simples modificação: em vez de usar *t0 direto, eu ultilizei uma variavel temporaria temp_t0 
+ 
 int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio, triangulo_t *triangulo, double *t0)
 {
     vetor_t v1, v2, normal, temp1_v, temp2_v;
@@ -215,13 +217,74 @@ int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio, triangulo_
      
     v1 = sub_v(&triangulo->vertices[1], &triangulo->vertices[0]);
     v2 = sub_v(&triangulo->vertices[2], &triangulo->vertices[0]);
-    
     normal = prod_v(&v1, &v2); // Vetor normal não normalizado
-    area_triangulo = modulo(&normal)/2.0; // Usa a regra do paralelograma
+    
+    //area_triangulo = modulo(&normal)/2.0; // Usa a regra do paralelograma
         
     // Detectando o ponto de intersecção no plano do triângulo.
     normal = normalizar(&normal);
-    denominador = prod_e(direcao_raio, &normal);
+    
+    
+    double d = prod_e(&normal, &triangulo->vertices[0]);
+    *t0 = (d - prod_e(&normal, origem_raio)) / prod_e(&normal, direcao_raio);
+    
+    temp1_v = mult_e(direcao_raio, *t0); //modificação
+    ponto_intersec = soma_v(origem_raio, &temp1_v);
+    
+    temp1_v = sub_v(&triangulo->vertices[1], &triangulo->vertices[0]);
+    temp2_v = sub_v(&ponto_intersec, &triangulo->vertices[0]);
+	temp1_v = prod_v(&temp1_v, &temp2_v);
+	temp1_v = normalizar(&temp1_v);
+	if(prod_e(&temp1_v, &normal) < 0)
+	{
+		*t0 = INFINITO;
+		return 0;
+	}
+	
+	temp1_v = sub_v(&triangulo->vertices[2], &triangulo->vertices[1]);
+    temp2_v = sub_v(&ponto_intersec, &triangulo->vertices[1]);
+	temp1_v = prod_v(&temp1_v, &temp2_v);
+	temp1_v = normalizar(&temp1_v);
+	if(prod_e(&temp1_v, &normal) < 0)
+	{
+		*t0 = INFINITO;
+		return 0;
+	}
+	
+	temp1_v = sub_v(&triangulo->vertices[0], &triangulo->vertices[2]);
+    temp2_v = sub_v(&ponto_intersec, &triangulo->vertices[2]);
+	temp1_v = prod_v(&temp1_v, &temp2_v);
+	temp1_v = normalizar(&temp1_v);
+	if(prod_e(&temp1_v, &normal) < 0)
+	{
+		*t0 = INFINITO;
+		return 0;
+	}
+    
+    /*
+        // check if ray and plane are parallel ?
+    float NdotRayDirection = prod_e(&normal, direcao_raio);
+    if(fabs(NdotRayDirection) < 0.00001)
+    {
+		return 0;
+	}
+    
+    float d = prod_e(&normal, &triangulo->vertices[0]);
+	*t0 = (prod_e(&normal, origem_raio) + d)/NdotRayDirection;
+	
+	
+    if (*t0 < 0)
+    { 
+		//printf("negativo\n");
+		//*t0 = INFINITO;
+		//*t0 = INFINITO;
+		return 0; // the triangle is behind 
+	}
+    */
+    
+    
+	/*
+	denominador = prod_e(&normal, direcao_raio);
 
     if (denominador > 1e-6 || denominador < -1e-6) // Não é perpendicular
     {
@@ -229,8 +292,10 @@ int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio, triangulo_
         numerador = prod_e(&distancia, &normal);
         
         *t0 = numerador/ denominador;
+        //temp_t0 = numerador/ denominador; // modificação
         
         if(*t0 < 0)
+        //if(temp_t0 < 0) //modificação
         {
             return 0;
         }
@@ -239,9 +304,13 @@ int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio, triangulo_
     {
         return 0;
     }
+    */
     
+    //if (denominador > 1e-6 || denominador < -1e-6) temp1_v = mult_e(direcao_raio, temp_t0); //introduzi essa linha, pode tirar se precisar
+    
+    /*
     // Calcula o ponto de intersecção
-    temp1_v = mult_e(direcao_raio, *t0);
+    temp1_v = mult_e(direcao_raio, *t0); //modificação
     ponto_intersec = soma_v(origem_raio, &temp1_v);
         
     // Vértice 0
@@ -277,9 +346,9 @@ int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio, triangulo_
     {
         return 0; // Ponto de intersecção está do lado direito.
     }
-
+	*/
     
-    return 1;
+    return 0;
 }
 
 
@@ -393,22 +462,23 @@ int intersecao_piramide(ponto_t *origem_raio, vetor_t *direcao_raio, piramide_t 
     triangulos[0].vertices[1] = piramide->vertices[1];
     triangulos[0].vertices[2] = piramide->vertices[2];
     
-    triangulos[1].vertices[0] = piramide->vertices[0];
+    triangulos[1].vertices[0] = piramide->vertices[3];
     triangulos[1].vertices[1] = piramide->vertices[1];
-    triangulos[1].vertices[2] = piramide->vertices[3];
+    triangulos[1].vertices[2] = piramide->vertices[0];
     
-    triangulos[2].vertices[0] = piramide->vertices[0];
+    triangulos[2].vertices[0] = piramide->vertices[3];
     triangulos[2].vertices[1] = piramide->vertices[2];
-    triangulos[2].vertices[2] = piramide->vertices[3];
+    triangulos[2].vertices[2] = piramide->vertices[0];
     
-    triangulos[3].vertices[0] = piramide->vertices[1];
+    triangulos[3].vertices[0] = piramide->vertices[3];
     triangulos[3].vertices[1] = piramide->vertices[2];
-    triangulos[3].vertices[2] = piramide->vertices[3];
+    triangulos[3].vertices[2] = piramide->vertices[1];
     
-    for(i = 0; i < 2; i++)
+    for(i = 0; i < 4; i++) //modifiquei alterando o valor de i < 2 para i < 4
     {
         if(intersecao_triangulo(origem_raio, direcao_raio, &triangulos[i], t0))
         {
+			//printf("Entrou %d\n", i);
             contagem++;
             
             if(contagem == 1)
@@ -427,6 +497,7 @@ int intersecao_piramide(ponto_t *origem_raio, vetor_t *direcao_raio, piramide_t 
                 return 1;
             }
         }
+
     }
     
     return 0;
@@ -446,7 +517,7 @@ int intersecao_piramide(ponto_t *origem_raio, vetor_t *direcao_raio, piramide_t 
 cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, luz_t *luz, int num_objetos, int num_recursoes, int max_recursoes)
 {
     cor_t cor, cor_reflexao;
-    double tperto, t0, t1;
+    double tperto, t0_esfera, t1_esfera, t0_piramide, t1_piramide;
     int i, j, luz_direta;
     objeto_t *objeto_perto;
     vetor_t normal, refletido, direcao_luz;
@@ -458,6 +529,7 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, l
  
     objeto_perto = 0;
     tperto = INFINITO; 
+    //tperto_piramide = INFINITO;
 
     /* Se não tocar nenhum objeto, então a cor será negativa. */
     cor.x = -1.0;
@@ -467,37 +539,61 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, l
     /* Encontra o objeto mais perto da câmera (caso exista). */
     for (i = 0; i < num_objetos; ++i) 
     {
-        t0 = INFINITO; 
-        t1 = INFINITO;
-
+        t0_esfera = INFINITO; 
+        t1_esfera = INFINITO;
+		t0_piramide = INFINITO; 
+        t1_piramide = INFINITO;
+        
         switch(objetos[i].tipo)
         {
         case ESFERA:
-            intersecao_esfera(origem_raio, direcao_raio, objetos[i].esfera, &t0, &t1);
+            intersecao_esfera(origem_raio, direcao_raio, objetos[i].esfera, &t0_esfera, &t1_esfera);
+            
+			if(t0_esfera == INFINITO)
+			{
+				break;
+			}
+			
+			if (t0_esfera  < 0) // Caso o raio tenha intersectado a borda.
+			{ 
+				t0_esfera  = t1_esfera;
+			}
+			
+			if (t0_esfera < tperto)
+			{
+				tperto = t0_esfera;		
+				objeto_perto = &objetos[i];
+			}
+			
+            
             break;
         case PIRAMIDE:
-            intersecao_piramide(origem_raio, direcao_raio, objetos[i].piramide, &t0, &t1);
+            intersecao_piramide(origem_raio, direcao_raio, objetos[i].piramide, &t0_piramide, &t1_piramide);
+            
+            //t0_piramide = INFINITO;
+            
+            if(t0_piramide == INFINITO)
+			{
+				break;
+			}
+			
+			if (t0_piramide  < 0) // Caso o raio tenha intersectado a borda.
+			{ 
+				t0_piramide  = t1_piramide;
+			}
+			
+			if (t0_piramide < tperto)
+			{
+				tperto = t0_piramide;
+				objeto_perto = &objetos[i];
+			}
+			
             break;
         default:
             break;
         }
         
-        if(t0 == INFINITO)
-        {
-            continue;
-        }
-        
-        if (t0 < 0) // Caso o raio tenha intersectado a borda.
-        { 
-            t0 = t1;
-        }
-        
-        if (t0 < tperto)
-        {
-            tperto = t0;
-            objeto_perto = &objetos[i];
-        }
-
+		
     }
     
     // Verifica se algum objeto não foi intersectado.
@@ -536,13 +632,57 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, l
 			switch(objetos[j].tipo)
 			{
 			case ESFERA:
-				if(intersecao_esfera(&ponto_intersec, &direcao_luz, objetos[j].esfera, &t0, &t1))
+				if(intersecao_esfera(&ponto_intersec, &direcao_luz, objetos[j].esfera, &t0_esfera, &t1_esfera))
 				{
 					luz_direta = 0;
 				}
 				break;
 			case PIRAMIDE:
-				if(intersecao_piramide(&ponto_intersec, &direcao_luz, objetos[j].piramide, &t0, &t1))
+				if(intersecao_piramide(&ponto_intersec, &direcao_luz, objetos[j].piramide, &t0_piramide, &t1_piramide))
+				{
+					luz_direta = 0;
+				}
+				break;
+			default:
+				break;
+			}
+			
+			if(!luz_direta)
+			{
+				break;
+			}
+		}
+				
+		temp2_v = mult_e(&objeto_perto->cor, luz_direta); // Cor do objeto ou sombra
+		temp4_f = max(0.0f, prod_e(&normal, &direcao_luz)); // Entre 0 e 1
+		temp3_v = mult_e(&temp2_v, temp4_f); // Multiplica cor por esse fator (um peso entre 0 e 1)
+		cor = mult_v(&temp3_v, &luz->cor);
+		    
+        break;
+        
+    case PIRAMIDE:	
+		// Calcula o ponto de intersecção do raio e da pirâmide.
+        temp1_v = mult_e(direcao_raio, tperto);
+        ponto_intersec = soma_v(origem_raio, &temp1_v);
+   
+		// Calcula a direção do vetor que sai do ponto até a fonte de luz.
+		direcao_luz = sub_v(&luz->posicao, &ponto_intersec);
+		direcao_luz = normalizar(&direcao_luz);
+		
+		// Percore os demais objetos para ver se há algum na frente.
+		luz_direta = 1;
+		for(j = 0; j < num_objetos; j++)
+		{
+			switch(objetos[j].tipo)
+			{
+			case ESFERA:
+				if(intersecao_esfera(&ponto_intersec, &direcao_luz, objetos[j].esfera, &t0_esfera, &t1_esfera))
+				{
+					luz_direta = 0;
+				}
+				break;
+			case PIRAMIDE:
+				if(intersecao_piramide(&ponto_intersec, &direcao_luz, objetos[j].piramide, &t0_piramide, &t1_piramide))
 				{
 					luz_direta = 0;
 				}
@@ -560,56 +700,9 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, l
 		
 		temp2_v = mult_e(&objeto_perto->cor, luz_direta); // Cor do objeto ou sombra
 		temp4_f = max(0.0f, prod_e(&normal, &direcao_luz)); // Entre 0 e 1
-		temp3_v = mult_e(&temp2_v, temp4_f); // Multiplica cor por esse fator (um peso entre 0 e 1)
-		cor = mult_v(&temp3_v, &luz->cor);
-		    
-        break;
-        
-    case PIRAMIDE:	
-    
-		// Calcula o ponto de intersecção do raio e da pirâmide.
-        temp1_v = mult_e(direcao_raio, tperto);
-        ponto_intersec = soma_v(origem_raio, &temp1_v);
-   
-		// Calcula a direção do vetor que sai do ponto até a fonte de luz.
-		direcao_luz = sub_v(&luz->posicao, &ponto_intersec);
-		direcao_luz = normalizar(&direcao_luz);
-		
-		// Percore os demais objetos para ver se há algum na frente.
-		luz_direta = 1;
-		for(j = 0; j < num_objetos; j++)
-		{
-			switch(objetos[j].tipo)
-			{
-			case ESFERA:
-				if(intersecao_esfera(&ponto_intersec, &direcao_luz, objetos[j].esfera, &t0, &t1))
-				{
-					luz_direta = 0;
-				}
-				break;
-			case PIRAMIDE:
-				if(intersecao_piramide(&ponto_intersec, &direcao_luz, objetos[j].piramide, &t0, &t1))
-				{
-					luz_direta = 0;
-				}
-				break;
-			default:
-				break;
-			}
-			
-			if(!luz_direta)
-			{
-				break;
-			}
-		}
-		
-		
-		temp2_v = mult_e(&objeto_perto->cor, luz_direta); // Cor do objeto ou sombra
-		//temp4_f = max(0.0f, prod_e(&normal, &direcao_luz)); // Entre 0 e 1
 		//temp3_v = mult_e(&temp2_v, temp4_f); // Multiplica cor por esse fator (um peso entre 0 e 1)
-		cor = mult_v(&temp3_v, &luz->cor);
+		//cor = mult_v(&temp3_v, &luz->cor);
 		cor = objeto_perto->cor;   
-		   
         break;		
 		
     

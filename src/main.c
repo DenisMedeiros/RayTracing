@@ -284,12 +284,39 @@ int main(int argc, char** argv)
 	objetos[4].piramide->vertices[3].y = 1.0;
 	objetos[4].piramide->vertices[3].z = -6.0;
 
-    objetos[4].cor.x = 1.0;
-    objetos[4].cor.y = 0.0;
-    objetos[4].cor.z = 1.0;
+    objetos[4].cor.x = 0.4;
+    objetos[4].cor.y = 0.8;
+    objetos[4].cor.z = 0.0;
     
-    objetos[4].refletivel = 1; 
-	
+    objetos[4].refletivel = 1;
+    
+    /*
+    objetos[5].tipo = PIRAMIDE;
+    objetos[5].piramide = malloc(sizeof(piramide_t));
+    
+    objetos[5].piramide->vertices[0].x = 5.0;
+	objetos[5].piramide->vertices[0].y = 0.0;
+	objetos[5].piramide->vertices[0].z = -9.0;
+
+    objetos[5].piramide->vertices[1].x = 7.0;
+	objetos[5].piramide->vertices[1].y = 0.0;
+	objetos[5].piramide->vertices[1].z = -9.0;
+
+	objetos[5].piramide->vertices[2].x = 6.0;
+	objetos[5].piramide->vertices[2].y = 2.0;
+	objetos[5].piramide->vertices[2].z = -9.0;
+
+	// Crista
+	objetos[5].piramide->vertices[3].x = 6.0;
+	objetos[5].piramide->vertices[3].y = 1.0;
+	objetos[5].piramide->vertices[3].z = -7.0;
+
+    objetos[5].cor.x = 1.0;
+    objetos[5].cor.y = 0.5;
+    objetos[5].cor.z = 0.5;
+    
+    objetos[5].refletivel = 1;
+	*/
     luz.posicao.x = 0;
     luz.posicao.y = 0;
     luz.posicao.z = 10;
