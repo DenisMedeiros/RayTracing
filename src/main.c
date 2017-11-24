@@ -7,15 +7,15 @@
 /* Configurações básicas. */
 
 #define NUM_ESFERAS 4
-#define NUM_CUBOS 0
-#define NUM_OBJETOS (NUM_ESFERAS + NUM_CUBOS)
+#define NUM_CUBOS 1
+#define NUM_OBJETOS (NUM_ESFERAS + NUM_CUBOS )
 
 #define Z_NEAR 1.0
-#define Z_FAR 20.0
+#define Z_FAR 80.0
 
 #define LF_X 0.0 // Look from x
 #define LF_Y 0.0 // Look from y
-#define LF_Z 5.0 // Look from z
+#define LF_Z 10.0 // Look from z
 
 #define LA_X 0.0 // Look at x
 #define LA_Y 0.0 // Look at y
@@ -32,8 +32,8 @@
 
 /* Configurações da animação. */
 
-#define GERAR_ANIMACAO
-#define SCREEN_FPS 24
+//#define GERAR_ANIMACAO
+//#define SCREEN_FPS 24
  
 /* Variáveis globais. */
 luz_t luz; // Fonte de luz
@@ -264,6 +264,47 @@ int main(int argc, char** argv)
     objetos[3].cor.y = 1.0;
     objetos[3].cor.z = 0.0;
     objetos[3].refletivel = 1; 
+    
+    objetos[4].tipo = CUBO;
+    objetos[4].cubo = malloc(sizeof(cubo_t));
+    
+    objetos[4].cubo->vertices[0].x = 0.0;
+    objetos[4].cubo->vertices[0].y = 0.0;
+    objetos[4].cubo->vertices[0].z = -5.0;
+
+    objetos[4].cubo->vertices[1].x = 0.0;
+    objetos[4].cubo->vertices[1].y = -1.0;
+    objetos[4].cubo->vertices[1].z = -5.0;
+
+    objetos[4].cubo->vertices[2].x = 1.0;
+    objetos[4].cubo->vertices[2].y = 0.0;
+    objetos[4].cubo->vertices[2].z = -5.0;
+    
+    objetos[4].cubo->vertices[3].x = 1.0;
+    objetos[4].cubo->vertices[3].y = -1.0;
+    objetos[4].cubo->vertices[3].z = -5.0;
+    
+    objetos[4].cubo->vertices[4].x = 0.0;
+    objetos[4].cubo->vertices[4].y = 0.0;
+    objetos[4].cubo->vertices[4].z = -10.0;
+
+    objetos[4].cubo->vertices[5].x = 0.0;
+    objetos[4].cubo->vertices[5].y = -1.0;
+    objetos[4].cubo->vertices[5].z = -10.0;
+
+    objetos[4].cubo->vertices[6].x = 1.0;
+    objetos[4].cubo->vertices[6].y = 0.0;
+    objetos[4].cubo->vertices[6].z = -10.0;
+    
+    objetos[4].cubo->vertices[7].x = 1.0;
+    objetos[4].cubo->vertices[7].y = -1.0;
+    objetos[4].cubo->vertices[7].z = -10.0;
+
+    objetos[4].cor.x = 1.0;
+    objetos[4].cor.y = 0.0;
+    objetos[4].cor.z = 1.0;
+    
+    objetos[4].refletivel = 1; 
 	
     luz.posicao.x = 0;
     luz.posicao.y = 0;
