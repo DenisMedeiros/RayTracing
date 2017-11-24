@@ -190,45 +190,46 @@ int intersecao_esfera(ponto_t *origem_raio, vetor_t *direcao_raio, esfera_t *esf
 
 
 /**
- * Verifica se um determinado raio intersecta uma cubo no espaço.
+ * Verifica se um determinado raio intersecta uma piramide no espaço.
  * 
  * @param origem_raio Ponteiro para o ponto no espaço de onde o 
  * raio parte.
  * @param direcao_raio Ponteiro para o vetor que determina a direção
  * do raio.
- * @param esf Ponteiro para o cubo a ser intersectado.
+ * @param esf Ponteiro para o piramide a ser intersectado.
  * @param t0 Ponteiro para a distância horizontal entre o ponto de 
  * origem e o primeiro ponto de interseção (é modificada na função).
  * @param t1 Ponteiro para a distância horizontal entre o ponto de 
  * origem e o segundo ponto de interseção (é modificada na função).
- * @return 1 se o raio intersecta o cubo, 0 caso contrário.
+ * @return 1 se o raio intersecta o piramide, 0 caso contrário.
  */ 
-int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio, triangulo_t *triangulo, double *a, double *b, double *c, double *t0)
+ 
+int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio, triangulo_t *triangulo, double *t0)
 {
     vetor_t v1, v2, normal, temp1_v, temp2_v;
     double area_triangulo;
     ponto_t ponto_intersec, temp1_p;
     double denominador, numerador;
     vetor_t distancia;
+    double a, b, c;
      
     v1 = sub_v(&triangulo->vertices[1], &triangulo->vertices[0]);
     v2 = sub_v(&triangulo->vertices[2], &triangulo->vertices[0]);
     
-    normal = prod_v(&v1, &v2); // Não normalizado
+    normal = prod_v(&v1, &v2); // Vetor normal não normalizado
     area_triangulo = modulo(&normal)/2.0; // Usa a regra do paralelograma
         
     // Detectando o ponto de intersecção no plano do triângulo.
     normal = normalizar(&normal);
     denominador = prod_e(direcao_raio, &normal);
-    
-   
-    
+
     if (denominador > 1e-6 || denominador < -1e-6) // Não é perpendicular
     {
         distancia = sub_v(&triangulo->vertices[0], origem_raio); // Ponto pertencente ao plano
         numerador = prod_e(&distancia, &normal);
         
         *t0 = numerador/ denominador;
+        
         if(*t0 < 0)
         {
             return 0;
@@ -244,122 +245,172 @@ int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio, triangulo_
     ponto_intersec = soma_v(origem_raio, &temp1_v);
         
     // Vértice 0
-    temp1_v = sub_v(&triangulo->vertices[2], &triangulo->vertices[0]);
-    temp1_p = sub_v(&ponto_intersec, &triangulo->vertices[0]);
-    temp2_v = prod_v(&temp1_v, &temp1_p);
-    *a = (modulo(&temp2_v)/2.0) / area_triangulo;
+    temp1_v = sub_v(&triangulo->vertices[0], &ponto_intersec);
+    temp2_v = sub_v(&triangulo->vertices[1], &ponto_intersec);
+    temp2_v = prod_v(&temp1_v, &temp2_v);
+    a = (modulo(&temp2_v)/2.0) / area_triangulo;
     
-    if(*a < 0 || *a > 1)
+    if(a < 0 || a > 1)
     {
         return 0; // Ponto de intersecção está do lado direito.
     }
     
     // Vértice 1
     
-    temp1_v = sub_v(&triangulo->vertices[2], &triangulo->vertices[1]);
-    temp1_p = sub_v(&ponto_intersec, &triangulo->vertices[1]);
-    temp2_v = prod_v(&temp1_v, &temp1_p);
-    *b = (modulo(&temp2_v)/2.0) / area_triangulo;
+    temp1_v = sub_v(&triangulo->vertices[0], &ponto_intersec);
+    temp2_v = sub_v(&triangulo->vertices[2], &ponto_intersec);
+    temp2_v = prod_v(&temp1_v, &temp2_v);
+    b = (modulo(&temp2_v)/2.0) / area_triangulo;
 
-    if(*b < 0 || *b > 1)
+    if(b < 0 || b > 1)
     {
         return 0; // Ponto de intersecção está do lado direito.
     }
     
     // Vértice 2
-    temp1_v = sub_v(&triangulo->vertices[0], &triangulo->vertices[2]);
-    temp1_p = sub_v(&ponto_intersec, &triangulo->vertices[2]);
-    temp2_v = prod_v(&temp1_v, &temp1_p);
-    *c = (modulo(&temp2_v)/2.0) / area_triangulo;
+    temp1_v = sub_v(&triangulo->vertices[1], &ponto_intersec);
+    temp2_v = sub_v(&triangulo->vertices[2], &ponto_intersec);
+    temp2_v = prod_v(&temp1_v, &temp2_v);
+    c = (modulo(&temp2_v)/2.0) / area_triangulo;
    
-    if(*c < 0 || *c > 1)
+    if(c < 0 || c > 1)
     {
         return 0; // Ponto de intersecção está do lado direito.
     }
 
     
     return 1;
+}
+
+
+int intersecao_triangulo2(ponto_t *origem_raio, vetor_t *direcao_raio, triangulo_t *triangulo, double *t0)
+{
+    vetor_t v1, v2, normal, temp1_v, temp2_v, vertice0, vertice1, vertice2;
+    ponto_t ponto_intersec;
+    double temp1_d, temp2_d;
+    double a, b, c, area2;
+     
+     // compute plane's normal
+    v1 = sub_v(&triangulo->vertices[1], &triangulo->vertices[0]);
+    v2 = sub_v(&triangulo->vertices[2], &triangulo->vertices[0]);
+    
+    normal = prod_v(&v1, &v2); // Vetor normal não normalizado
+    area2 = modulo(&normal); 
+    
+    // Step 1: finding P
+    
+
+    // check if ray and plane are parallel ?
+
+    temp1_d = prod_e(&normal, direcao_raio);
+    
+    if(temp1_d < 0.0001)
+    {
+		return 0; // they are parallel so they don't intersect ! 
+	}
+    
+    // compute d parameter using equation 2
+    temp2_d = prod_e(&normal,  &triangulo->vertices[0]);
+    
+	// calcula t
+	
+	*t0 = (prod_e(&normal, origem_raio) + temp2_d) / temp1_d;
+
+	if(*t0 < 0) // Triangulo atras do raio
+	{
+		return 0;
+	}
+
+	temp1_v = mult_e(direcao_raio, *t0);
+	ponto_intersec = soma_v(origem_raio, &temp1_v);
+ 
+
+	// Testando se está dentro
+	
+	vertice0  = sub_v(&triangulo->vertices[1], &triangulo->vertices[0]);
+	temp2_v = sub_v(&ponto_intersec, &triangulo->vertices[0]);
+	temp2_v = prod_v(&vertice0, &temp2_v);
+	a = prod_e(&normal, &temp2_v);
+	
+	if(a < 0)
+	{
+		return 0;
+	}
+	
+
+ 	vertice1  = sub_v(&triangulo->vertices[2], &triangulo->vertices[1]);
+	temp2_v = sub_v(&ponto_intersec, &triangulo->vertices[1]);
+	temp2_v = prod_v(&vertice1, &temp2_v);
+	b = prod_e(&normal, &temp2_v);
+	
+	if(b < 0)
+	{
+		return 0;
+	}
+
+ 
+ 	vertice2  = sub_v(&triangulo->vertices[0], &triangulo->vertices[2]);
+	temp2_v = sub_v(&ponto_intersec, &triangulo->vertices[2]);
+	temp2_v = prod_v(&vertice2, &temp2_v);
+	c = prod_e(&normal, &temp2_v);
+	
+	if(c < 0)
+	{
+		return 0;
+	}
+ 
+    return 1; // this ray hits the triangle 
     
 
 }
 
+
 /**
- * Verifica se um determinado raio intersecta uma cubo no espaço.
+ * Verifica se um determinado raio intersecta uma piramide no espaço.
  * 
  * @param origem_raio Ponteiro para o ponto no espaço de onde o 
  * raio parte.
  * @param direcao_raio Ponteiro para o vetor que determina a direção
  * do raio.
- * @param esf Ponteiro para o cubo a ser intersectado.
+ * @param esf Ponteiro para o piramide a ser intersectado.
  * @param t0 Ponteiro para a distância horizontal entre o ponto de 
  * origem e o primeiro ponto de interseção (é modificada na função).
  * @param t1 Ponteiro para a distância horizontal entre o ponto de 
  * origem e o segundo ponto de interseção (é modificada na função).
- * @return 1 se o raio intersecta o cubo, 0 caso contrário.
+ * @return 1 se o raio intersecta o piramide, 0 caso contrário.
  */ 
-int intersecao_cubo(ponto_t *origem_raio, vetor_t *direcao_raio, cubo_t *cubo, double *t0, double *t1)
+int intersecao_piramide(ponto_t *origem_raio, vetor_t *direcao_raio, piramide_t *piramide, double *t0, double *t1)
 {
-    double a, b, c, temp;
+    double temp;
     int i, contagem;
     
     contagem = 0;
     
     // Construindo os triângulos
-    triangulo_t triangulos[12];
+    triangulo_t triangulos[4];
     
-    triangulos[0].vertices[0] = cubo->vertices[0];
-    triangulos[0].vertices[1] = cubo->vertices[1];
-    triangulos[0].vertices[2] = cubo->vertices[3];
+    triangulos[0].vertices[0] = piramide->vertices[0];
+    triangulos[0].vertices[1] = piramide->vertices[1];
+    triangulos[0].vertices[2] = piramide->vertices[2];
     
-    triangulos[1].vertices[0] = cubo->vertices[0];
-    triangulos[1].vertices[1] = cubo->vertices[2];
-    triangulos[1].vertices[2] = cubo->vertices[3];
+    triangulos[1].vertices[0] = piramide->vertices[0];
+    triangulos[1].vertices[1] = piramide->vertices[1];
+    triangulos[1].vertices[2] = piramide->vertices[3];
     
-    triangulos[2].vertices[0] = cubo->vertices[0];
-    triangulos[2].vertices[1] = cubo->vertices[2];
-    triangulos[2].vertices[2] = cubo->vertices[4];
+    triangulos[2].vertices[0] = piramide->vertices[0];
+    triangulos[2].vertices[1] = piramide->vertices[2];
+    triangulos[2].vertices[2] = piramide->vertices[3];
     
-    triangulos[3].vertices[0] = cubo->vertices[2];
-    triangulos[3].vertices[1] = cubo->vertices[4];
-    triangulos[3].vertices[2] = cubo->vertices[6];
+    triangulos[3].vertices[0] = piramide->vertices[1];
+    triangulos[3].vertices[1] = piramide->vertices[2];
+    triangulos[3].vertices[2] = piramide->vertices[3];
     
-    triangulos[4].vertices[0] = cubo->vertices[4];
-    triangulos[4].vertices[1] = cubo->vertices[5];
-    triangulos[4].vertices[2] = cubo->vertices[6];
-    
-    triangulos[5].vertices[0] = cubo->vertices[5];
-    triangulos[5].vertices[1] = cubo->vertices[6];
-    triangulos[5].vertices[2] = cubo->vertices[7];
-    
-    triangulos[6].vertices[0] = cubo->vertices[1];
-    triangulos[6].vertices[1] = cubo->vertices[3];
-    triangulos[6].vertices[2] = cubo->vertices[5];
-    
-    triangulos[7].vertices[0] = cubo->vertices[3];
-    triangulos[7].vertices[1] = cubo->vertices[5];
-    triangulos[7].vertices[2] = cubo->vertices[7];
-    
-    triangulos[8].vertices[0] = cubo->vertices[2];
-    triangulos[8].vertices[1] = cubo->vertices[3];
-    triangulos[8].vertices[2] = cubo->vertices[7];
-    
-    triangulos[9].vertices[0] = cubo->vertices[2];
-    triangulos[9].vertices[1] = cubo->vertices[6];
-    triangulos[9].vertices[2] = cubo->vertices[7];
-    
-    triangulos[10].vertices[0] = cubo->vertices[0];
-    triangulos[10].vertices[1] = cubo->vertices[4];
-    triangulos[10].vertices[2] = cubo->vertices[5];
-    
-    triangulos[11].vertices[0] = cubo->vertices[0];
-    triangulos[11].vertices[1] = cubo->vertices[1];
-    triangulos[11].vertices[2] = cubo->vertices[5];
-
-    for(i = 0; i < 12; i++)
+    for(i = 0; i < 2; i++)
     {
-        if(intersecao_triangulo(origem_raio, direcao_raio, &triangulos[i], &a, &b, &c, t0))
+        if(intersecao_triangulo(origem_raio, direcao_raio, &triangulos[i], t0))
         {
             contagem++;
+            
             if(contagem == 1)
             {
                 *t1 = *t0;
@@ -424,8 +475,8 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, l
         case ESFERA:
             intersecao_esfera(origem_raio, direcao_raio, objetos[i].esfera, &t0, &t1);
             break;
-        case CUBO:
-            intersecao_cubo(origem_raio, direcao_raio, objetos[i].cubo, &t0, &t1);
+        case PIRAMIDE:
+            intersecao_piramide(origem_raio, direcao_raio, objetos[i].piramide, &t0, &t1);
             break;
         default:
             break;
@@ -474,170 +525,93 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, l
                 normal = neg_v(&normal);
         }
         
-        // Parte recursiva do raytracing.
-        if(objeto_perto->refletivel && num_recursoes < max_recursoes)
-        {
-            // Calcula a direção do raio refletido e normaliza-o.
-            temp1_v = mult_e(&normal, 2 * prod_e(direcao_raio, &normal));
-            refletido = sub_v(direcao_raio, &temp1_v);
-            refletido = normalizar(&refletido);    
-
-            cor_reflexao = raytrace(&ponto_intersec, &refletido, objetos, luz, num_objetos, num_recursoes + 1, max_recursoes);
-
-            if(cor_reflexao.x == -1)
-            {
-                // Calcula a direção do vetor que sai do ponto até a fonte de luz.
-                direcao_luz = sub_v(&luz->posicao, &ponto_intersec);
-                direcao_luz = normalizar(&direcao_luz);
-
-                temp4_f = max(0.0f, prod_e(&normal, &direcao_luz)); // Entre 0 e 1
-                temp3_v = mult_e(&objeto_perto->cor, temp4_f); // Multiplica cor por esse fator (um peso entre 0 e 1)
-                cor = mult_v(&temp3_v, &luz->cor);         
-            }
-            else
-            {
-                temp1_v = mult_e(&objeto_perto->cor, 0.7);
-                temp2_v = mult_e(&cor_reflexao, 0.3);
-                cor = soma_v(&temp1_v, &temp2_v);
-
-                cor = mult_e(&cor_reflexao, brilho(&objeto_perto->cor));
-                
-                //cor = mult_v(&cor_reflexao, &objeto_perto->cor);
-            }
-        }
-        else // Calculo da cor em fução da luz.
-        {
-            // Calcula a direção do vetor que sai do ponto até a fonte de luz.
-            direcao_luz = sub_v(&luz->posicao, &ponto_intersec);
-            direcao_luz = normalizar(&direcao_luz);
-            
-            // Percore os demais objetos para ver se há algum na frente.
-            luz_direta = 1;
-            for(j = 0; j < num_objetos; j++)
-            {
-                switch(objetos[j].tipo)
-                {
-                case ESFERA:
-                    if(intersecao_esfera(&ponto_intersec, &direcao_luz, objetos[j].esfera, &t0, &t1))
-                    {
-                        luz_direta = 0;
-                    }
-                    break;
-                case CUBO:
-                    if(intersecao_cubo(&ponto_intersec, &direcao_luz, objetos[j].cubo, &t0, &t1))
-                    {
-                        luz_direta = 0;
-                    }
-                    break;
-                default:
-                    break;
-                }
-                
-                if(!luz_direta)
-                {
-                    break;
-                }
-            }
-            
-            
-            temp2_v = mult_e(&objeto_perto->cor, luz_direta); // Cor do objeto ou sombra
-            temp4_f = max(0.0f, prod_e(&normal, &direcao_luz)); // Entre 0 e 1
-            temp3_v = mult_e(&temp2_v, temp4_f); // Multiplica cor por esse fator (um peso entre 0 e 1)
-            cor = mult_v(&temp3_v, &luz->cor);
-            
-        }
-            
+		// Calcula a direção do vetor que sai do ponto até a fonte de luz.
+		direcao_luz = sub_v(&luz->posicao, &ponto_intersec);
+		direcao_luz = normalizar(&direcao_luz);
+		
+		// Percore os demais objetos para ver se há algum na frente.
+		luz_direta = 1;
+		for(j = 0; j < num_objetos; j++)
+		{
+			switch(objetos[j].tipo)
+			{
+			case ESFERA:
+				if(intersecao_esfera(&ponto_intersec, &direcao_luz, objetos[j].esfera, &t0, &t1))
+				{
+					luz_direta = 0;
+				}
+				break;
+			case PIRAMIDE:
+				if(intersecao_piramide(&ponto_intersec, &direcao_luz, objetos[j].piramide, &t0, &t1))
+				{
+					luz_direta = 0;
+				}
+				break;
+			default:
+				break;
+			}
+			
+			if(!luz_direta)
+			{
+				break;
+			}
+		}
+		
+		
+		temp2_v = mult_e(&objeto_perto->cor, luz_direta); // Cor do objeto ou sombra
+		temp4_f = max(0.0f, prod_e(&normal, &direcao_luz)); // Entre 0 e 1
+		temp3_v = mult_e(&temp2_v, temp4_f); // Multiplica cor por esse fator (um peso entre 0 e 1)
+		cor = mult_v(&temp3_v, &luz->cor);
+		    
         break;
-    case CUBO:
+        
+    case PIRAMIDE:	
     
-    
-        // Calcula o ponto de intersecção do raio e do cubo.
-		temp1_v = mult_e(direcao_raio, tperto);
-		ponto_intersec = soma_v(origem_raio, &temp1_v);
-    
-        // Parte recursiva do raytracing.
-        if(objeto_perto->refletivel && num_recursoes < max_recursoes)
-        {
-            // Direcao luz
-		    temp2_v = mult_e(&normal, 2 * prod_e(direcao_raio, &normal));
-		    refletido = sub_v(direcao_raio, &temp1_v);
-            
-            // Calcula a direção do raio refletido e normaliza-o.
-            temp1_v = mult_e(&normal, 2 * prod_e(direcao_raio, &normal));
-            refletido = sub_v(direcao_raio, &temp1_v);
-            refletido = normalizar(&refletido);    
-
-            cor_reflexao = raytrace(&ponto_intersec, &refletido, objetos, luz, num_objetos, num_recursoes + 1, max_recursoes);
-
-            if(cor_reflexao.x == -1)
-            {
-                // Calcula a direção do vetor que sai do ponto até a fonte de luz.
-                direcao_luz = sub_v(&luz->posicao, &ponto_intersec);
-                direcao_luz = normalizar(&direcao_luz);
-
-                temp4_f = max(0.0f, prod_e(&normal, &direcao_luz)); // Entre 0 e 1
-                temp3_v = mult_e(&objeto_perto->cor, temp4_f); // Multiplica cor por esse fator (um peso entre 0 e 1)
-                cor = mult_v(&temp3_v, &luz->cor);         
-            }
-            else
-            {
-                temp1_v = mult_e(&objeto_perto->cor, 0.7);
-                temp2_v = mult_e(&cor_reflexao, 0.3);
-                cor = soma_v(&temp1_v, &temp2_v);
-
-                cor = mult_e(&cor_reflexao, brilho(&objeto_perto->cor));
-                
-                //cor = mult_v(&cor_reflexao, &objeto_perto->cor);
-            }
-        }
-        else // Calculo da cor em fução da luz.
-        {
-            // Calcula a direção do vetor que sai do ponto até a fonte de luz.
-            direcao_luz = sub_v(&luz->posicao, &ponto_intersec);
-            direcao_luz = normalizar(&direcao_luz);
-            
-            // Percore os demais objetos para ver se há algum na frente.
-            luz_direta = 1;
-            for(j = 0; j < num_objetos; j++)
-            {
-                switch(objetos[j].tipo)
-                {
-                case ESFERA:
-                    if(intersecao_esfera(&ponto_intersec, &direcao_luz, objetos[j].esfera, &t0, &t1))
-                    {
-                        luz_direta = 0;
-                    }
-                    break;
-                case CUBO:
-                    if(intersecao_cubo(&ponto_intersec, &direcao_luz, objetos[j].cubo, &t0, &t1))
-                    {
-                        luz_direta = 0;
-                    }
-                    break;
-                default:
-                    break;
-                }
-                
-                if(!luz_direta)
-                {
-                    break;
-                }
-            }
-            
-            temp2_v = mult_e(&objeto_perto->cor, luz_direta); // Cor do objeto ou sombra
-            temp4_f = max(0.0f, prod_e(&normal, &direcao_luz)); // Entre 0 e 1
-            temp3_v = mult_e(&temp2_v, temp4_f); // Multiplica cor por esse fator (um peso entre 0 e 1)
-            cor = mult_v(&temp3_v, &luz->cor);
-            
-        }
-            
-        break;
-    
-    
-    
-    
-    
-    
+		// Calcula o ponto de intersecção do raio e da pirâmide.
+        temp1_v = mult_e(direcao_raio, tperto);
+        ponto_intersec = soma_v(origem_raio, &temp1_v);
+   
+		// Calcula a direção do vetor que sai do ponto até a fonte de luz.
+		direcao_luz = sub_v(&luz->posicao, &ponto_intersec);
+		direcao_luz = normalizar(&direcao_luz);
+		
+		// Percore os demais objetos para ver se há algum na frente.
+		luz_direta = 1;
+		for(j = 0; j < num_objetos; j++)
+		{
+			switch(objetos[j].tipo)
+			{
+			case ESFERA:
+				if(intersecao_esfera(&ponto_intersec, &direcao_luz, objetos[j].esfera, &t0, &t1))
+				{
+					luz_direta = 0;
+				}
+				break;
+			case PIRAMIDE:
+				if(intersecao_piramide(&ponto_intersec, &direcao_luz, objetos[j].piramide, &t0, &t1))
+				{
+					luz_direta = 0;
+				}
+				break;
+			default:
+				break;
+			}
+			
+			if(!luz_direta)
+			{
+				break;
+			}
+		}
+		
+		
+		temp2_v = mult_e(&objeto_perto->cor, luz_direta); // Cor do objeto ou sombra
+		//temp4_f = max(0.0f, prod_e(&normal, &direcao_luz)); // Entre 0 e 1
+		//temp3_v = mult_e(&temp2_v, temp4_f); // Multiplica cor por esse fator (um peso entre 0 e 1)
+		cor = mult_v(&temp3_v, &luz->cor);
+		cor = objeto_perto->cor;   
+		   
+        break;		
+		
     
     default:
         break;

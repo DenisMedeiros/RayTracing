@@ -2,13 +2,14 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
+#include <math.h>
 #include "geometria.h"
 
 /* Configurações básicas. */
 
 #define NUM_ESFERAS 4
-#define NUM_CUBOS 1
-#define NUM_OBJETOS (NUM_ESFERAS + NUM_CUBOS )
+#define NUM_PIRAMIDES 1
+#define NUM_OBJETOS (NUM_ESFERAS + NUM_PIRAMIDES)
 
 #define Z_NEAR 1.0
 #define Z_FAR 80.0
@@ -76,8 +77,6 @@ void display(void)
     vetor_t dir; // Vetor direção.
     cor_t pixel;
     
-    
-   
     glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(1.0, 1.0, 1.0);
     glPushMatrix();    
@@ -265,40 +264,25 @@ int main(int argc, char** argv)
     objetos[3].cor.z = 0.0;
     objetos[3].refletivel = 1; 
     
-    objetos[4].tipo = CUBO;
-    objetos[4].cubo = malloc(sizeof(cubo_t));
+    objetos[4].tipo = PIRAMIDE;
+    objetos[4].piramide = malloc(sizeof(piramide_t));
     
-    objetos[4].cubo->vertices[0].x = 0.0;
-    objetos[4].cubo->vertices[0].y = 0.0;
-    objetos[4].cubo->vertices[0].z = -5.0;
+    objetos[4].piramide->vertices[0].x = 0.0;
+	objetos[4].piramide->vertices[0].y = 0.0;
+	objetos[4].piramide->vertices[0].z = -8.0;
 
-    objetos[4].cubo->vertices[1].x = 0.0;
-    objetos[4].cubo->vertices[1].y = -1.0;
-    objetos[4].cubo->vertices[1].z = -5.0;
+    objetos[4].piramide->vertices[1].x = 2.0;
+	objetos[4].piramide->vertices[1].y = 0.0;
+	objetos[4].piramide->vertices[1].z = -8.0;
+	
+	objetos[4].piramide->vertices[2].x = 1.0;
+	objetos[4].piramide->vertices[2].y = 2.0;
+	objetos[4].piramide->vertices[2].z = -8.0;
 
-    objetos[4].cubo->vertices[2].x = 1.0;
-    objetos[4].cubo->vertices[2].y = 0.0;
-    objetos[4].cubo->vertices[2].z = -5.0;
-    
-    objetos[4].cubo->vertices[3].x = 1.0;
-    objetos[4].cubo->vertices[3].y = -1.0;
-    objetos[4].cubo->vertices[3].z = -5.0;
-    
-    objetos[4].cubo->vertices[4].x = 0.0;
-    objetos[4].cubo->vertices[4].y = 0.0;
-    objetos[4].cubo->vertices[4].z = -10.0;
-
-    objetos[4].cubo->vertices[5].x = 0.0;
-    objetos[4].cubo->vertices[5].y = -1.0;
-    objetos[4].cubo->vertices[5].z = -10.0;
-
-    objetos[4].cubo->vertices[6].x = 1.0;
-    objetos[4].cubo->vertices[6].y = 0.0;
-    objetos[4].cubo->vertices[6].z = -10.0;
-    
-    objetos[4].cubo->vertices[7].x = 1.0;
-    objetos[4].cubo->vertices[7].y = -1.0;
-    objetos[4].cubo->vertices[7].z = -10.0;
+	// Crista
+	objetos[4].piramide->vertices[3].x = 1.0;
+	objetos[4].piramide->vertices[3].y = 1.0;
+	objetos[4].piramide->vertices[3].z = -6.0;
 
     objetos[4].cor.x = 1.0;
     objetos[4].cor.y = 0.0;

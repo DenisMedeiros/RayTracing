@@ -44,17 +44,6 @@ typedef struct {
     double raio;
 } esfera_t;
 
-/** 
- * Estrutura para armazenar um cubo. 
- * 
- * Para ser representado, a esfera precisa de um centro e do tamanho do lado.
- * Os vértices devem ser fornecidos iniciando de cima para baixo, depois esquerda
- * para direita e por fim da frente para trás.
- * 
- */
-typedef struct {
-    ponto_t vertices[8];
-} cubo_t;
 
 /** 
  * Estrutura para armazenar um triangulo. 
@@ -65,17 +54,26 @@ typedef struct {
     ponto_t vertices[3];
 } triangulo_t;
 
+/** 
+ * Estrutura para armazenar uma piramidade. 
+ * 
+ * 
+ */
+typedef struct {
+    ponto_t vertices[4];
+} piramide_t;
+
 
 /** 
  * Estrutura para armazenar um objeto (pode ser esfera ou cubo).
  * 
  */
 typedef struct {
-    enum {ESFERA, CUBO} tipo;
+    enum {ESFERA, PIRAMIDE} tipo;
     union 
     {
         esfera_t *esfera;
-        cubo_t *cubo;
+        piramide_t *piramide;
     };
 	cor_t cor;
 	char refletivel;
@@ -189,37 +187,37 @@ int intersecao_esfera(ponto_t *origem_raio, vetor_t *direcao_raio, esfera_t *esf
 
 
 /**
- * Verifica se um determinado raio intersecta uma cubo no espaço.
+ * Verifica se um determinado raio intersecta uma piramide no espaço.
  * 
  * @param origem_raio Ponteiro para o ponto no espaço de onde o 
  * raio parte.
  * @param direcao_raio Ponteiro para o vetor que determina a direção
  * do raio.
- * @param esf Ponteiro para o cubo a ser intersectado.
+ * @param esf Ponteiro para o piramide a ser intersectado.
  * @param t0 Ponteiro para a distância horizontal entre o ponto de 
  * origem e o primeiro ponto de interseção (é modificada na função).
  * @param t1 Ponteiro para a distância horizontal entre o ponto de 
  * origem e o segundo ponto de interseção (é modificada na função).
- * @return 1 se o raio intersecta o cubo, 0 caso contrário.
+ * @return 1 se o raio intersecta o piramide, 0 caso contrário.
  */ 
-int intersecao_cubo(ponto_t *origem_raio, vetor_t *direcao_raio, cubo_t *cubo, double *t0, double *t1);
+int intersecao_piramide(ponto_t *origem_raio, vetor_t *direcao_raio, piramide_t *piramide, double *t0, double *t1);
 
 
 /**
- * Verifica se um determinado raio intersecta uma cubo no espaço.
+ * Verifica se um determinado raio intersecta uma piramide no espaço.
  * 
  * @param origem_raio Ponteiro para o ponto no espaço de onde o 
  * raio parte.
  * @param direcao_raio Ponteiro para o vetor que determina a direção
  * do raio.
- * @param esf Ponteiro para o cubo a ser intersectado.
+ * @param esf Ponteiro para o piramide a ser intersectado.
  * @param t0 Ponteiro para a distância horizontal entre o ponto de 
  * origem e o primeiro ponto de interseção (é modificada na função).
  * @param t1 Ponteiro para a distância horizontal entre o ponto de 
  * origem e o segundo ponto de interseção (é modificada na função).
- * @return 1 se o raio intersecta o cubo, 0 caso contrário.
+ * @return 1 se o raio intersecta o piramide, 0 caso contrário.
  */ 
-int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio, triangulo_t *triangulo, double *a, double *b, double *c, double *t0);
+int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio, triangulo_t *triangulo, double *t0);
 
 /** 
  * Faz a operação de raytracing resursiva. 
