@@ -211,228 +211,65 @@ int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio, triangulo_
     vetor_t v1, v2, normal, temp1_v, temp2_v;
     double area_triangulo;
     ponto_t ponto_intersec, temp1_p;
-    double denominador, numerador;
+    double denominador;
     vetor_t distancia;
-    double a, b, c;
-     
+    double temp1_d, d, t0_temp;
+    
+    
     v1 = sub_v(&triangulo->vertices[1], &triangulo->vertices[0]);
     v2 = sub_v(&triangulo->vertices[2], &triangulo->vertices[0]);
     normal = prod_v(&v1, &v2); // Vetor normal não normalizado
-    
-    //area_triangulo = modulo(&normal)/2.0; // Usa a regra do paralelograma
-        
-    // Detectando o ponto de intersecção no plano do triângulo.
-    normal = normalizar(&normal);
-    
-    
-    double d = prod_e(&normal, &triangulo->vertices[0]);
-    *t0 = (d - prod_e(&normal, origem_raio)) / prod_e(&normal, direcao_raio);
-    
-    temp1_v = mult_e(direcao_raio, *t0); //modificação
-    ponto_intersec = soma_v(origem_raio, &temp1_v);
-    
-    temp1_v = sub_v(&triangulo->vertices[1], &triangulo->vertices[0]);
-    temp2_v = sub_v(&ponto_intersec, &triangulo->vertices[0]);
-	temp1_v = prod_v(&temp1_v, &temp2_v);
-	temp1_v = normalizar(&temp1_v);
-	if(prod_e(&temp1_v, &normal) < 0)
-	{
-		*t0 = INFINITO;
-		return 0;
-	}
+	normal = normalizar(&normal);
 	
-	temp1_v = sub_v(&triangulo->vertices[2], &triangulo->vertices[1]);
-    temp2_v = sub_v(&ponto_intersec, &triangulo->vertices[1]);
-	temp1_v = prod_v(&temp1_v, &temp2_v);
-	temp1_v = normalizar(&temp1_v);
-	if(prod_e(&temp1_v, &normal) < 0)
-	{
-		*t0 = INFINITO;
-		return 0;
-	}
-	
-	temp1_v = sub_v(&triangulo->vertices[0], &triangulo->vertices[2]);
-    temp2_v = sub_v(&ponto_intersec, &triangulo->vertices[2]);
-	temp1_v = prod_v(&temp1_v, &temp2_v);
-	temp1_v = normalizar(&temp1_v);
-	if(prod_e(&temp1_v, &normal) < 0)
-	{
-		*t0 = INFINITO;
-		return 0;
-	}
-    
-    /*
-        // check if ray and plane are parallel ?
-    float NdotRayDirection = prod_e(&normal, direcao_raio);
-    if(fabs(NdotRayDirection) < 0.00001)
-    {
-		return 0;
-	}
-    
-    float d = prod_e(&normal, &triangulo->vertices[0]);
-	*t0 = (prod_e(&normal, origem_raio) + d)/NdotRayDirection;
-	
-	
-    if (*t0 < 0)
-    { 
-		//printf("negativo\n");
-		//*t0 = INFINITO;
-		//*t0 = INFINITO;
-		return 0; // the triangle is behind 
-	}
-    */
-    
-    
-	/*
-	denominador = prod_e(&normal, direcao_raio);
-
-    if (denominador > 1e-6 || denominador < -1e-6) // Não é perpendicular
-    {
-        distancia = sub_v(&triangulo->vertices[0], origem_raio); // Ponto pertencente ao plano
-        numerador = prod_e(&distancia, &normal);
-        
-        *t0 = numerador/ denominador;
-        //temp_t0 = numerador/ denominador; // modificação
-        
-        if(*t0 < 0)
-        //if(temp_t0 < 0) //modificação
-        {
-            return 0;
-        }
-    } 
-    else
-    {
-        return 0;
-    }
-    */
-    
-    //if (denominador > 1e-6 || denominador < -1e-6) temp1_v = mult_e(direcao_raio, temp_t0); //introduzi essa linha, pode tirar se precisar
-    
-    /*
-    // Calcula o ponto de intersecção
-    temp1_v = mult_e(direcao_raio, *t0); //modificação
-    ponto_intersec = soma_v(origem_raio, &temp1_v);
-        
-    // Vértice 0
-    temp1_v = sub_v(&triangulo->vertices[0], &ponto_intersec);
-    temp2_v = sub_v(&triangulo->vertices[1], &ponto_intersec);
-    temp2_v = prod_v(&temp1_v, &temp2_v);
-    a = (modulo(&temp2_v)/2.0) / area_triangulo;
-    
-    if(a < 0 || a > 1)
-    {
-        return 0; // Ponto de intersecção está do lado direito.
-    }
-    
-    // Vértice 1
-    
-    temp1_v = sub_v(&triangulo->vertices[0], &ponto_intersec);
-    temp2_v = sub_v(&triangulo->vertices[2], &ponto_intersec);
-    temp2_v = prod_v(&temp1_v, &temp2_v);
-    b = (modulo(&temp2_v)/2.0) / area_triangulo;
-
-    if(b < 0 || b > 1)
-    {
-        return 0; // Ponto de intersecção está do lado direito.
-    }
-    
-    // Vértice 2
-    temp1_v = sub_v(&triangulo->vertices[1], &ponto_intersec);
-    temp2_v = sub_v(&triangulo->vertices[2], &ponto_intersec);
-    temp2_v = prod_v(&temp1_v, &temp2_v);
-    c = (modulo(&temp2_v)/2.0) / area_triangulo;
-   
-    if(c < 0 || c > 1)
-    {
-        return 0; // Ponto de intersecção está do lado direito.
-    }
-	*/
-    
-    return 0;
-}
-
-
-int intersecao_triangulo2(ponto_t *origem_raio, vetor_t *direcao_raio, triangulo_t *triangulo, double *t0)
-{
-    vetor_t v1, v2, normal, temp1_v, temp2_v, vertice0, vertice1, vertice2;
-    ponto_t ponto_intersec;
-    double temp1_d, temp2_d;
-    double a, b, c, area2;
-     
-     // compute plane's normal
-    v1 = sub_v(&triangulo->vertices[1], &triangulo->vertices[0]);
-    v2 = sub_v(&triangulo->vertices[2], &triangulo->vertices[0]);
-    
-    normal = prod_v(&v1, &v2); // Vetor normal não normalizado
-    area2 = modulo(&normal); 
-    
     // Step 1: finding P
-    
-
+ 
     // check if ray and plane are parallel ?
-
-    temp1_d = prod_e(&normal, direcao_raio);
-    
-    if(temp1_d < 0.0001)
+    denominador = prod_e(&normal, direcao_raio);
+    if (fabs(denominador) < 0.0001)
     {
-		return 0; // they are parallel so they don't intersect ! 
+		return 0;
 	}
     
-    // compute d parameter using equation 2
-    temp2_d = prod_e(&normal,  &triangulo->vertices[0]);
-    
-	// calcula t
+	d = prod_e(&normal, &triangulo->vertices[0]);
+	t0_temp = (prod_e(&normal, origem_raio) + d)/denominador;
 	
-	*t0 = (prod_e(&normal, origem_raio) + temp2_d) / temp1_d;
-
-	if(*t0 < 0) // Triangulo atras do raio
+	// check if the triangle is in behind the ray
+	if(t0_temp < 0)
 	{
 		return 0;
 	}
-
-	temp1_v = mult_e(direcao_raio, *t0);
+	
+	// compute the intersection point using equation 1
+	temp1_v = mult_e(direcao_raio, t0_temp);
 	ponto_intersec = soma_v(origem_raio, &temp1_v);
  
-
-	// Testando se está dentro
-	
-	vertice0  = sub_v(&triangulo->vertices[1], &triangulo->vertices[0]);
+	temp1_v = sub_v(&triangulo->vertices[1], &triangulo->vertices[0]);
 	temp2_v = sub_v(&ponto_intersec, &triangulo->vertices[0]);
-	temp2_v = prod_v(&vertice0, &temp2_v);
-	a = prod_e(&normal, &temp2_v);
-	
-	if(a < 0)
+	temp1_v = prod_v(&temp1_v, &temp2_v);
+	if(prod_e(&normal, &temp1_v) < 0)
 	{
 		return 0;
 	}
-	
-
- 	vertice1  = sub_v(&triangulo->vertices[2], &triangulo->vertices[1]);
+ 
+	temp1_v = sub_v(&triangulo->vertices[2], &triangulo->vertices[1]);
 	temp2_v = sub_v(&ponto_intersec, &triangulo->vertices[1]);
-	temp2_v = prod_v(&vertice1, &temp2_v);
-	b = prod_e(&normal, &temp2_v);
-	
-	if(b < 0)
+	temp1_v = prod_v(&temp1_v, &temp2_v);
+	if(prod_e(&normal, &temp1_v) < 0)
 	{
 		return 0;
 	}
-
  
- 	vertice2  = sub_v(&triangulo->vertices[0], &triangulo->vertices[2]);
+ 	temp1_v = sub_v(&triangulo->vertices[0], &triangulo->vertices[2]);
 	temp2_v = sub_v(&ponto_intersec, &triangulo->vertices[2]);
-	temp2_v = prod_v(&vertice2, &temp2_v);
-	c = prod_e(&normal, &temp2_v);
-	
-	if(c < 0)
+	temp1_v = prod_v(&temp1_v, &temp2_v);
+	if(prod_e(&normal, &temp1_v) < 0)
 	{
 		return 0;
 	}
  
-    return 1; // this ray hits the triangle 
-    
-
+	*t0 = t0_temp;
+    return 1;
 }
-
 
 /**
  * Verifica se um determinado raio intersecta uma piramide no espaço.
@@ -462,23 +299,22 @@ int intersecao_piramide(ponto_t *origem_raio, vetor_t *direcao_raio, piramide_t 
     triangulos[0].vertices[1] = piramide->vertices[1];
     triangulos[0].vertices[2] = piramide->vertices[2];
     
-    triangulos[1].vertices[0] = piramide->vertices[3];
+    triangulos[1].vertices[0] = piramide->vertices[0];
     triangulos[1].vertices[1] = piramide->vertices[1];
-    triangulos[1].vertices[2] = piramide->vertices[0];
+    triangulos[1].vertices[2] = piramide->vertices[3];
     
-    triangulos[2].vertices[0] = piramide->vertices[3];
+    triangulos[2].vertices[0] = piramide->vertices[0];
     triangulos[2].vertices[1] = piramide->vertices[2];
-    triangulos[2].vertices[2] = piramide->vertices[0];
+    triangulos[2].vertices[2] = piramide->vertices[3];
     
-    triangulos[3].vertices[0] = piramide->vertices[3];
+    triangulos[3].vertices[0] = piramide->vertices[1];
     triangulos[3].vertices[1] = piramide->vertices[2];
-    triangulos[3].vertices[2] = piramide->vertices[1];
+    triangulos[3].vertices[2] = piramide->vertices[3];
     
     for(i = 0; i < 4; i++) //modifiquei alterando o valor de i < 2 para i < 4
     {
         if(intersecao_triangulo(origem_raio, direcao_raio, &triangulos[i], t0))
         {
-			//printf("Entrou %d\n", i);
             contagem++;
             
             if(contagem == 1)
@@ -569,9 +405,7 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, l
             break;
         case PIRAMIDE:
             intersecao_piramide(origem_raio, direcao_raio, objetos[i].piramide, &t0_piramide, &t1_piramide);
-            
-            //t0_piramide = INFINITO;
-            
+                        
             if(t0_piramide == INFINITO)
 			{
 				break;
