@@ -205,7 +205,6 @@ int intersecao_esfera(ponto_t *origem_raio, vetor_t *direcao_raio, esfera_t *esf
  */ 
  
 // fiz uma simples modificação: em vez de usar *t0 direto, eu ultilizei uma variavel temporaria temp_t0 
- 
 int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio, triangulo_t *triangulo, double *t0)
 {
     vetor_t v1, v2, normal, temp1_v, temp2_v;
@@ -218,56 +217,57 @@ int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio, triangulo_
     
     v1 = sub_v(&triangulo->vertices[1], &triangulo->vertices[0]);
     v2 = sub_v(&triangulo->vertices[2], &triangulo->vertices[0]);
+    
     normal = prod_v(&v1, &v2); // Vetor normal não normalizado
-	normal = normalizar(&normal);
+    //normal = normalizar(&normal);
 	
     // Step 1: finding P
  
     // check if ray and plane are parallel ?
     denominador = prod_e(&normal, direcao_raio);
-    if (fabs(denominador) < 0.0001)
+    if (fabs(denominador) < 0.00001)
     {
-		return 0;
-	}
+	return 0;
+    }
+
+    d = prod_e(&normal, &triangulo->vertices[0]);
+    t0_temp = -(prod_e(&normal, origem_raio) - d)/denominador;
     
-	d = prod_e(&normal, &triangulo->vertices[0]);
-	t0_temp = (prod_e(&normal, origem_raio) + d)/denominador;
-	
-	// check if the triangle is in behind the ray
-	if(t0_temp < 0)
-	{
-		return 0;
-	}
-	
-	// compute the intersection point using equation 1
-	temp1_v = mult_e(direcao_raio, t0_temp);
-	ponto_intersec = soma_v(origem_raio, &temp1_v);
- 
-	temp1_v = sub_v(&triangulo->vertices[1], &triangulo->vertices[0]);
-	temp2_v = sub_v(&ponto_intersec, &triangulo->vertices[0]);
-	temp1_v = prod_v(&temp1_v, &temp2_v);
-	if(prod_e(&normal, &temp1_v) < 0)
-	{
-		return 0;
-	}
- 
-	temp1_v = sub_v(&triangulo->vertices[2], &triangulo->vertices[1]);
-	temp2_v = sub_v(&ponto_intersec, &triangulo->vertices[1]);
-	temp1_v = prod_v(&temp1_v, &temp2_v);
-	if(prod_e(&normal, &temp1_v) < 0)
-	{
-		return 0;
-	}
- 
- 	temp1_v = sub_v(&triangulo->vertices[0], &triangulo->vertices[2]);
-	temp2_v = sub_v(&ponto_intersec, &triangulo->vertices[2]);
-	temp1_v = prod_v(&temp1_v, &temp2_v);
-	if(prod_e(&normal, &temp1_v) < 0)
-	{
-		return 0;
-	}
- 
-	*t0 = t0_temp;
+    // check if the triangle is in behind the ray
+    if(t0_temp < 0)
+    {
+	    return 0;
+    }
+    
+    // compute the intersection point using equation 1
+    temp1_v = mult_e(direcao_raio, t0_temp);
+    ponto_intersec = soma_v(origem_raio, &temp1_v);
+
+    temp1_v = sub_v(&triangulo->vertices[1], &triangulo->vertices[0]);
+    temp2_v = sub_v(&ponto_intersec, &triangulo->vertices[0]);
+    temp1_v = prod_v(&temp1_v, &temp2_v);
+    if(prod_e(&temp1_v, &normal) < 0)
+    {
+	    return 0;
+    }
+
+    temp1_v = sub_v(&triangulo->vertices[2], &triangulo->vertices[1]);
+    temp2_v = sub_v(&ponto_intersec, &triangulo->vertices[1]);
+    temp1_v = prod_v(&temp1_v, &temp2_v);
+    if(prod_e(&temp1_v, &normal) < 0)
+    {
+	    return 0;
+    }
+
+    temp1_v = sub_v(&triangulo->vertices[0], &triangulo->vertices[2]);
+    temp2_v = sub_v(&ponto_intersec, &triangulo->vertices[2]);
+    temp1_v = prod_v(&temp1_v, &temp2_v);
+    if(prod_e(&temp1_v, &normal) < 0)
+    {
+	    return 0;
+    }
+
+    *t0 = t0_temp;
     return 1;
 }
 
@@ -377,7 +377,7 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, l
     {
         t0_esfera = INFINITO; 
         t1_esfera = INFINITO;
-		t0_piramide = INFINITO; 
+	t0_piramide = INFINITO; 
         t1_piramide = INFINITO;
         
         switch(objetos[i].tipo)
@@ -385,21 +385,21 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, l
         case ESFERA:
             intersecao_esfera(origem_raio, direcao_raio, objetos[i].esfera, &t0_esfera, &t1_esfera);
             
-			if(t0_esfera == INFINITO)
-			{
-				break;
-			}
-			
-			if (t0_esfera  < 0) // Caso o raio tenha intersectado a borda.
-			{ 
-				t0_esfera  = t1_esfera;
-			}
-			
-			if (t0_esfera < tperto)
-			{
-				tperto = t0_esfera;		
-				objeto_perto = &objetos[i];
-			}
+	    if(t0_esfera == INFINITO)
+	    {
+		break;
+	    }
+	    
+	    if (t0_esfera  < 0) // Caso o raio tenha intersectado a borda.
+	    { 
+		t0_esfera  = t1_esfera;
+	    }
+	    
+	    if (t0_esfera < tperto)
+	    {
+		tperto = t0_esfera;		
+		objeto_perto = &objetos[i];
+	    }
 			
             
             break;
@@ -407,20 +407,20 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, l
             intersecao_piramide(origem_raio, direcao_raio, objetos[i].piramide, &t0_piramide, &t1_piramide);
                         
             if(t0_piramide == INFINITO)
-			{
-				break;
-			}
-			
-			if (t0_piramide  < 0) // Caso o raio tenha intersectado a borda.
-			{ 
-				t0_piramide  = t1_piramide;
-			}
-			
-			if (t0_piramide < tperto)
-			{
-				tperto = t0_piramide;
-				objeto_perto = &objetos[i];
-			}
+	    {
+		break;
+	    }
+	    
+	    if (t0_piramide  < 0) // Caso o raio tenha intersectado a borda.
+	    { 
+		t0_piramide  = t1_piramide;
+	    }
+	    
+	    if (t0_piramide < tperto)
+	    {
+		tperto = t0_piramide;
+		objeto_perto = &objetos[i];
+	    }
 			
             break;
         default:
@@ -455,88 +455,90 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, l
                 normal = neg_v(&normal);
         }
         
-		// Calcula a direção do vetor que sai do ponto até a fonte de luz.
-		direcao_luz = sub_v(&luz->posicao, &ponto_intersec);
-		direcao_luz = normalizar(&direcao_luz);
-		
-		// Percore os demais objetos para ver se há algum na frente.
-		luz_direta = 1;
-		for(j = 0; j < num_objetos; j++)
+	// Calcula a direção do vetor que sai do ponto até a fonte de luz.
+	direcao_luz = sub_v(&luz->posicao, &ponto_intersec);
+	direcao_luz = normalizar(&direcao_luz);
+	
+	// Percore os demais objetos para ver se há algum na frente.
+	luz_direta = 1;
+	for(j = 0; j < num_objetos; j++)
+	{
+		switch(objetos[j].tipo)
 		{
-			switch(objetos[j].tipo)
-			{
-			case ESFERA:
-				if(intersecao_esfera(&ponto_intersec, &direcao_luz, objetos[j].esfera, &t0_esfera, &t1_esfera))
-				{
-					luz_direta = 0;
-				}
-				break;
-			case PIRAMIDE:
-				if(intersecao_piramide(&ponto_intersec, &direcao_luz, objetos[j].piramide, &t0_piramide, &t1_piramide))
-				{
-					luz_direta = 0;
-				}
-				break;
-			default:
-				break;
-			}
-			
-			if(!luz_direta)
-			{
-				break;
-			}
+		case ESFERA:
+		    if(intersecao_esfera(&ponto_intersec, &direcao_luz, objetos[j].esfera, &t0_esfera, &t1_esfera))
+		    {
+			    luz_direta = 0;
+		    }
+		    break;
+		case PIRAMIDE:
+		    if(intersecao_piramide(&ponto_intersec, &direcao_luz, objetos[j].piramide, &t0_piramide, &t1_piramide))
+		    {
+			    luz_direta = 0;
+		    }
+		    break;
+		default:
+		    break;
 		}
-				
-		temp2_v = mult_e(&objeto_perto->cor, luz_direta); // Cor do objeto ou sombra
-		temp4_f = max(0.0f, prod_e(&normal, &direcao_luz)); // Entre 0 e 1
-		temp3_v = mult_e(&temp2_v, temp4_f); // Multiplica cor por esse fator (um peso entre 0 e 1)
-		cor = mult_v(&temp3_v, &luz->cor);
+		
+		if(!luz_direta)
+		{
+		    break;
+		}
+	}
+			
+	temp2_v = mult_e(&objeto_perto->cor, luz_direta); // Cor do objeto ou sombra
+	temp4_f = max(0.0f, prod_e(&normal, &direcao_luz)); // Entre 0 e 1
+	temp3_v = mult_e(&temp2_v, temp4_f); // Multiplica cor por esse fator (um peso entre 0 e 1)
+	cor = mult_v(&temp3_v, &luz->cor);
 		    
         break;
         
-    case PIRAMIDE:	
-		// Calcula o ponto de intersecção do raio e da pirâmide.
+    case PIRAMIDE:
+    	
+	// Calcula o ponto de intersecção do raio e da pirâmide.
         temp1_v = mult_e(direcao_raio, tperto);
         ponto_intersec = soma_v(origem_raio, &temp1_v);
+	//printf("Ponto de int = (%f, %f, %f)\n", ponto_intersec.x, ponto_intersec.y, ponto_intersec.z);
    
-		// Calcula a direção do vetor que sai do ponto até a fonte de luz.
-		direcao_luz = sub_v(&luz->posicao, &ponto_intersec);
-		direcao_luz = normalizar(&direcao_luz);
-		
-		// Percore os demais objetos para ver se há algum na frente.
-		luz_direta = 1;
-		for(j = 0; j < num_objetos; j++)
+	// Calcula a direção do vetor que sai do ponto até a fonte de luz.
+	direcao_luz = sub_v(&luz->posicao, &ponto_intersec);
+	direcao_luz = normalizar(&direcao_luz);
+	
+	// Percore os demais objetos para ver se há algum na frente.
+	luz_direta = 1;
+	for(j = 0; j < num_objetos; j++)
+	{
+		switch(objetos[j].tipo)
 		{
-			switch(objetos[j].tipo)
-			{
-			case ESFERA:
-				if(intersecao_esfera(&ponto_intersec, &direcao_luz, objetos[j].esfera, &t0_esfera, &t1_esfera))
-				{
-					luz_direta = 0;
-				}
-				break;
-			case PIRAMIDE:
-				if(intersecao_piramide(&ponto_intersec, &direcao_luz, objetos[j].piramide, &t0_piramide, &t1_piramide))
-				{
-					luz_direta = 0;
-				}
-				break;
-			default:
-				break;
-			}
-			
-			if(!luz_direta)
-			{
-				break;
-			}
+		case ESFERA:
+		    if(intersecao_esfera(&ponto_intersec, &direcao_luz, objetos[j].esfera, &t0_esfera, &t1_esfera))
+		    {
+			    luz_direta = 0;
+		    }
+		    break;
+		case PIRAMIDE:
+		    if(intersecao_piramide(&ponto_intersec, &direcao_luz, objetos[j].piramide, &t0_piramide, &t1_piramide))
+		    {
+			    luz_direta = 0;
+		    }
+		    break;
+		default:
+		    break;
 		}
 		
+		if(!luz_direta)
+		{
+		    break;
+		}
+	}
 		
-		temp2_v = mult_e(&objeto_perto->cor, luz_direta); // Cor do objeto ou sombra
-		temp4_f = max(0.0f, prod_e(&normal, &direcao_luz)); // Entre 0 e 1
-		//temp3_v = mult_e(&temp2_v, temp4_f); // Multiplica cor por esse fator (um peso entre 0 e 1)
-		//cor = mult_v(&temp3_v, &luz->cor);
-		cor = objeto_perto->cor;   
+		
+	temp2_v = mult_e(&objeto_perto->cor, luz_direta); // Cor do objeto ou sombra
+	temp4_f = max(0.0f, prod_e(&normal, &direcao_luz)); // Entre 0 e 1
+	//temp3_v = mult_e(&temp2_v, temp4_f); // Multiplica cor por esse fator (um peso entre 0 e 1)
+	//cor = mult_v(&temp3_v, &luz->cor);
+	cor = objeto_perto->cor;   
         break;		
 		
     

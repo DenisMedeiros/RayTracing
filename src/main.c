@@ -7,7 +7,7 @@
 
 /* Configurações básicas. */
 
-#define NUM_ESFERAS 4
+#define NUM_ESFERAS 0
 #define NUM_PIRAMIDES 1
 #define NUM_OBJETOS (NUM_ESFERAS + NUM_PIRAMIDES)
 
@@ -218,7 +218,7 @@ void keyboard (unsigned char key, int x, int y)
 
 int main(int argc, char** argv)
 {
-
+    /*
     // Criação das esferas
     objetos[0].tipo = ESFERA;
     objetos[0].esfera = malloc(sizeof(esfera_t));
@@ -263,32 +263,33 @@ int main(int argc, char** argv)
     objetos[3].cor.y = 1.0;
     objetos[3].cor.z = 0.0;
     objetos[3].refletivel = 1; 
+    */ 
     
-    objetos[4].tipo = PIRAMIDE;
-    objetos[4].piramide = malloc(sizeof(piramide_t));
+    objetos[0].tipo = PIRAMIDE;
+    objetos[0].piramide = malloc(sizeof(piramide_t));
     
-    objetos[4].piramide->vertices[0].x = 0.0;
-	objetos[4].piramide->vertices[0].y = 0.0;
-	objetos[4].piramide->vertices[0].z = -8.0;
+    objetos[0].piramide->vertices[0].x = 0.0;
+	objetos[0].piramide->vertices[0].y = 0.0;
+	objetos[0].piramide->vertices[0].z = -8.0;
 
-    objetos[4].piramide->vertices[1].x = 2.0;
-	objetos[4].piramide->vertices[1].y = 0.0;
-	objetos[4].piramide->vertices[1].z = -8.0;
+    objetos[0].piramide->vertices[1].x = 2.0;
+	objetos[0].piramide->vertices[1].y = 0.0;
+	objetos[0].piramide->vertices[1].z = -8.0;
 	
-	objetos[4].piramide->vertices[2].x = 1.0;
-	objetos[4].piramide->vertices[2].y = 2.0;
-	objetos[4].piramide->vertices[2].z = -8.0;
+	objetos[0].piramide->vertices[2].x = 1.0;
+	objetos[0].piramide->vertices[2].y = 2.0;
+	objetos[0].piramide->vertices[2].z = -8.0;
 
 	// Crista
-	objetos[4].piramide->vertices[3].x = 1.0;
-	objetos[4].piramide->vertices[3].y = 1.0;
-	objetos[4].piramide->vertices[3].z = -6.0;
+	objetos[0].piramide->vertices[3].x = 1.0;
+	objetos[0].piramide->vertices[3].y = 1.0;
+	objetos[0].piramide->vertices[3].z = -6.0;
 
-    objetos[4].cor.x = 0.4;
-    objetos[4].cor.y = 0.8;
-    objetos[4].cor.z = 0.0;
+    objetos[0].cor.x = 0.4;
+    objetos[0].cor.y = 0.8;
+    objetos[0].cor.z = 0.0;
     
-    objetos[4].refletivel = 1;
+    objetos[0].refletivel = 1;
     
     /*
     objetos[5].tipo = PIRAMIDE;
@@ -317,8 +318,8 @@ int main(int argc, char** argv)
     
     objetos[5].refletivel = 1;
 	*/
-    luz.posicao.x = 0;
-    luz.posicao.y = 0;
+    luz.posicao.x = 10.0;
+    luz.posicao.y = 10.0;
     luz.posicao.z = 10;
 
     luz.cor.x = 1.0;
