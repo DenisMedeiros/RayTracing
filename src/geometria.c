@@ -1,6 +1,12 @@
 #include "geometria.h"
 #include <math.h>
 #include <stdio.h>
+
+extern double ka;
+extern double kd;
+extern double ks;
+extern double eta;
+extern double os;
 /** 
  * Esta função faz a soma de dois vetores.
  * 
@@ -137,6 +143,11 @@ vetor_t prod_v(vetor_t *v1, vetor_t *v2)
     return v3;
 }
 
+void imprimir_vetor(const char *nome, vetor_t *v1)
+{
+    printf("%s: (%lf, %lf, %lf)\n", nome, v1->x, v1->y, v1->z);
+}
+
 /**
  * Verifica se um determinado raio intersecta uma esfera no espaço.
  * 
@@ -208,11 +219,9 @@ int intersecao_esfera(ponto_t *origem_raio, vetor_t *direcao_raio, esfera_t *esf
 int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio, triangulo_t *triangulo, double *t0, vetor_t *normal)
 {
     vetor_t v1, v2, temp1_v, temp2_v;
-    double area_triangulo;
-    ponto_t ponto_intersec, temp1_p;
+    ponto_t ponto_intersec;
     double denominador;
-    vetor_t distancia;
-    double temp1_d, d, t0_temp;
+    double d, t0_temp;
     
     
     v1 = sub_v(&triangulo->vertices[1], &triangulo->vertices[0]);
@@ -352,15 +361,13 @@ int intersecao_piramide(ponto_t *origem_raio, vetor_t *direcao_raio, piramide_t 
  */
 cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, luz_t *luz_local, luz_t *luz_ambiente, int num_objetos, int num_recursoes, int max_recursoes)
 {
-    cor_t cor, cor_reflexao;
+    cor_t cor;
     double tperto, t0_esfera, t1_esfera, t0_piramide, t1_piramide;
     int i, j, luz_direta;
     objeto_t *objeto_perto;
-    vetor_t normal, normal_pir, refletido, direcao_luz;
+    vetor_t normal, normal_pir, direcao_luz;
     ponto_t ponto_intersec;
-    
-    double distancia;
-    
+       
     // Variáveis auxiliares paras as funções vetoriais
     vetor_t temp1_v, temp2_v, temp3_v;
     float temp4_f;
@@ -502,15 +509,7 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, l
 	// Calcula o ponto de intersecção do raio e da pirâmide.
         temp1_v = mult_e(direcao_raio, tperto);
         ponto_intersec = soma_v(origem_raio, &temp1_v);
-	//printf("Ponto de int = (%f, %f, %f)\n", ponto_intersec.x, ponto_intersec.y, ponto_intersec.z);
    
-	// Calcula a direção do vetor que sai do ponto até a fonte de luz.
-	direcao_luz = sub_v(&luz_local->posicao, &ponto_intersec);
-	distancia = modulo(&direcao_luz);
-	direcao_luz = normalizar(&direcao_luz);
-	
-	//printf("%lf\n", distancia);
-	
 	// Percore os demais objetos para ver se há algum na frente.
 	luz_direta = 1;
 	for(j = 0; j < num_objetos; j++)
@@ -541,20 +540,8 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, l
 		
 		
 	temp2_v = mult_e(&objeto_perto->cor, luz_direta); // Cor do objeto ou sombra
-	
-	vetor_t esp;
-	
-	esp.x = 1.0;
-	esp.y = 1.0;
-	esp.z = 1.0;
-	
-	cor = calcular_iluminacao(origem_raio, luz_local, luz_ambiente, &ponto_intersec, &normal, &objeto_perto->cor, &esp);
-	
-	//temp4_f = max(0.0f, prod_e(&normal, &direcao_luz)); // Entre 0 e 1
-	//temp3_v = mult_e(&temp2_v, temp4_f); // Multiplica cor por esse fator (um peso entre 0 e 1)
-	//cor = mult_v(&temp3_v, &luz->cor);
-	//cor = temp2_v;
-	//cor = objeto_perto->cor;   
+	normal = normalizar(&normal);
+	cor = calcular_iluminacao(origem_raio, luz_local, luz_ambiente, &ponto_intersec, &normal, &temp2_v, &luz_local->cor);
         break;		
 		
     
@@ -572,39 +559,56 @@ cor_t calcular_iluminacao(ponto_t *origem_raio, luz_t *luz_local, luz_t *luz_amb
     cor_t ambiente;
     cor_t difusa;
     cor_t especular;
-    cor_t cor_final;
     
+    cor_t cor_final;
+        
     vetor_t dir_luz;
     vetor_t dir_obs;
     vetor_t refletido;
     double temp1_d;
-    vetor_t temp1_v, temp2_v;
-        
+    vetor_t temp1_v;
+    
+    // Direção para o observador.
     dir_obs = sub_v(origem_raio, pos_ponto);
-    
-    dir_luz = sub_v(&luz_local->posicao, pos_ponto);
-    dir_luz = normalizar(&dir_luz);
-    
-    
-    // Calcula a luz difusa
-    difusa = mult_e(cor_ponto, KD * max(0, prod_e(normal_ponto, &dir_luz)));
-    
+    dir_obs = normalizar(&dir_obs);
     
     // Calcula a direção do raio refletido e normaliza-o.
     dir_luz = neg_v(&dir_luz);
-    
-    temp1_v = mult_e(&normal_ponto, 2 * prod_e(&dir_luz, &normal_ponto));
+    temp1_v = mult_e(normal_ponto, 2 * prod_e(&dir_luz, normal_ponto));
     refletido = sub_v(&dir_luz, &temp1_v);
     refletido = normalizar(&refletido);    
     
-    // Calcula a luz especular
-    temp1_d = max(0, prod_e(&refletido, &dir_obs));
-    especular = mult_e(especular_ponto, KS * pow(temp1_d, BRILHO_FLAT));
+    // Calcula a direção da luz (ponto intersec até a luz).
+    dir_luz = sub_v(&luz_local->posicao, pos_ponto);
+    dir_luz = normalizar(&dir_luz);
     
-    // Calcula a luz ambiente
-    ambiente = mult_e(luz_ambiente, KA);
+    // Calcula a luz ambiente;.
+    ambiente = mult_e(&luz_ambiente->cor, ka);
+    
+    // Calcula a luz difusa
+    difusa = mult_e(&luz_local->cor, kd * max(0.0f, prod_e(normal_ponto, &dir_luz)));
+
+    // Calcula a luz especular
+    temp1_d = max(0.0f, prod_e(&refletido, &dir_obs));
+    especular = mult_e(&luz_local->cor, os * ks * pow(temp1_d, eta));
+    
+    
+    //imprimir_vetor("ambiente", &ambiente);
+    //imprimir_vetor("difusa", &difusa);
+    //imprimir_vetor("especular", &especular);
+    
+    
     cor_final = soma_v(&ambiente, &difusa);
     cor_final = soma_v(&cor_final, &especular);
     
+    cor_final = mult_v(cor_ponto, &cor_final);
+
+    
+    //imprimir_vetor("final", &cor_final);
+    
     return cor_final;
 }
+
+
+
+

@@ -11,11 +11,6 @@
 /** Valor de PI. */
 #define PI 3.14159265358979323846
 
-#define KA 0.1
-#define KD 0.8
-#define KS 0.1
-
-#define BRILHO_FLAT 0.8
 /** 
  * Estrutura que define um vetor ou ponto no espaço. 
  * Ela contém apenas as 3 componentes para representar o vetor 
@@ -238,9 +233,11 @@ int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio, triangulo_
 cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, luz_t *luz_local,  luz_t *luz_ambiente, int num_objetos, int num_reflexoes, int max_recursoes);
 
 
-
+/* Calcula a luz/cor do objeto. */
 cor_t calcular_iluminacao(ponto_t *origem_raio, luz_t *luz_local, luz_t *luz_ambiente, ponto_t *pos_ponto, vetor_t *normal_ponto, cor_t *cor_ponto, vetor_t *especular_ponto);
 
+
+void imprimir_vetor(const char *nome, vetor_t *v1);
 
 #endif // GEOMETRIA_H
 

@@ -31,13 +31,6 @@
 
 #define MAX_REC 0
 
-
-/* Configurações de iluminação. */
-
-
-
-/* Configurações da animação. */
-
 //#define GERAR_ANIMACAO
 //#define SCREEN_FPS 24
  
@@ -48,6 +41,12 @@ luz_t luz_local; // Fonte de luz
 objeto_t objetos[NUM_OBJETOS]; // Lista de objetos
 float *pixels; // Matriz de píxels de 3 canais.
 int altura, largura;
+
+double ka;
+double kd;
+double ks;
+double eta;
+double os;
 
 #ifdef GERAR_ANIMACAO
 /** Função que faz as mudanças da animação. */
@@ -292,9 +291,9 @@ int main(int argc, char** argv)
 	objetos[0].piramide->vertices[3].y = 1.0;
 	objetos[0].piramide->vertices[3].z = -6.0;
 
-    objetos[0].cor.x = 0.4;
-    objetos[0].cor.y = 0.8;
-    objetos[0].cor.z = 0.0;
+    objetos[0].cor.x = 0.0;
+    objetos[0].cor.y = 0.0;
+    objetos[0].cor.z = 1.0;
     
     objetos[0].refletivel = 1;
     
@@ -325,12 +324,21 @@ int main(int argc, char** argv)
     
     objetos[5].refletivel = 1;
 	*/
+    
+    // Soma deve dar 1.0
+    ka = 0.4;
+    kd = 0.1;
+    ks = 0.5;
+    
+    eta = 10.0;
+    os = 0.2;
+    
     luz_local.posicao.x = 0.0;
     luz_local.posicao.y = 0.0;
     luz_local.posicao.z = 10.0;
 
     luz_local.cor.x = 1.0;
-    luz_local.cor.y = 1.0;
+    luz_local.cor.y = 0.0;
     luz_local.cor.z = 1.0;
     
     luz_ambiente.cor.x = 1.0;
@@ -355,8 +363,8 @@ int main(int argc, char** argv)
 
     free(pixels);
     free(objetos[0].esfera);
-    free(objetos[1].esfera);
-    free(objetos[2].esfera);
-    free(objetos[3].esfera);
+    //free(objetos[1].esfera);
+    //free(objetos[2].esfera);
+    //free(objetos[3].esfera);
     return 0;
 }
