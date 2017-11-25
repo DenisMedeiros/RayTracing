@@ -225,13 +225,13 @@ int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio, triangulo_
  
     // check if ray and plane are parallel ?
     denominador = prod_e(&normal, direcao_raio);
-    if (fabs(denominador) < 0.00001)
+    if (fabs(denominador) < 0.01)
     {
 	return 0;
     }
 
     d = prod_e(&normal, &triangulo->vertices[0]);
-    t0_temp = -(prod_e(&normal, origem_raio) - d)/denominador;
+    t0_temp = (d - prod_e(&normal, origem_raio))/denominador;
     
     // check if the triangle is in behind the ray
     if(t0_temp < 0)
@@ -514,13 +514,13 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, l
 		case ESFERA:
 		    if(intersecao_esfera(&ponto_intersec, &direcao_luz, objetos[j].esfera, &t0_esfera, &t1_esfera))
 		    {
-			    luz_direta = 0;
+			luz_direta = 0;
 		    }
 		    break;
 		case PIRAMIDE:
 		    if(intersecao_piramide(&ponto_intersec, &direcao_luz, objetos[j].piramide, &t0_piramide, &t1_piramide))
 		    {
-			    luz_direta = 0;
+			luz_direta = 0;
 		    }
 		    break;
 		default:
@@ -535,10 +535,11 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, l
 		
 		
 	temp2_v = mult_e(&objeto_perto->cor, luz_direta); // Cor do objeto ou sombra
-	temp4_f = max(0.0f, prod_e(&normal, &direcao_luz)); // Entre 0 e 1
+	//temp4_f = max(0.0f, prod_e(&normal, &direcao_luz)); // Entre 0 e 1
 	//temp3_v = mult_e(&temp2_v, temp4_f); // Multiplica cor por esse fator (um peso entre 0 e 1)
 	//cor = mult_v(&temp3_v, &luz->cor);
-	cor = objeto_perto->cor;   
+	cor = temp2_v;
+	//cor = objeto_perto->cor;   
         break;		
 		
     

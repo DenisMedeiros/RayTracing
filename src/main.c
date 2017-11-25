@@ -318,9 +318,9 @@ int main(int argc, char** argv)
     
     objetos[5].refletivel = 1;
 	*/
-    luz.posicao.x = 10.0;
-    luz.posicao.y = 10.0;
-    luz.posicao.z = 10;
+    luz.posicao.x = 0.0;
+    luz.posicao.y = 0.0;
+    luz.posicao.z = 10.0;
 
     luz.cor.x = 1.0;
     luz.cor.y = 1.0;
