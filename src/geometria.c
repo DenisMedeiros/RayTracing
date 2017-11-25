@@ -382,171 +382,161 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, l
     cor.z = -1.0;
     
     /* Encontra o objeto mais perto da câmera (caso exista). */
-    for (i = 0; i < num_objetos; ++i) 
-    {
+    for (i = 0; i < num_objetos; ++i){
         t0_esfera = INFINITO; 
         t1_esfera = INFINITO;
-	t0_piramide = INFINITO; 
+		t0_piramide = INFINITO; 
         t1_piramide = INFINITO;
         
-        switch(objetos[i].tipo)
-        {
-        case ESFERA:
-            intersecao_esfera(origem_raio, direcao_raio, objetos[i].esfera, &t0_esfera, &t1_esfera);
-            
-	    if(t0_esfera == INFINITO)
-	    {
-		break;
-	    }
-	    
-	    if (t0_esfera  < 0) // Caso o raio tenha intersectado a borda.
-	    { 
-		t0_esfera  = t1_esfera;
-	    }
-	    
-	    if (t0_esfera < tperto)
-	    {
-		tperto = t0_esfera;		
-		objeto_perto = &objetos[i];
-	    }
-			
-            
-            break;
-        case PIRAMIDE:
-            intersecao_piramide(origem_raio, direcao_raio, objetos[i].piramide, &t0_piramide, &t1_piramide, &normal_pir);
-                        
-            if(t0_piramide == INFINITO)
-	    {
-		break;
-	    }
-	    
-	    if (t0_piramide  < 0) // Caso o raio tenha intersectado a borda.
-	    { 
-		t0_piramide  = t1_piramide;
-	    }
-	    
-	    if (t0_piramide < tperto)
-	    {
-		tperto = t0_piramide;
-		objeto_perto = &objetos[i];
-		normal = normal_pir;
-	    }
-			
-            break;
-        default:
-            break;
+        switch(objetos[i].tipo){
+			case ESFERA:
+				intersecao_esfera(origem_raio, direcao_raio, objetos[i].esfera, &t0_esfera, &t1_esfera);
+
+				if(t0_esfera == INFINITO)
+				{
+					break;
+				}
+
+				if (t0_esfera  < 0) // Caso o raio tenha intersectado a borda.
+				{ 
+					t0_esfera  = t1_esfera;
+				}
+
+				if (t0_esfera < tperto)
+				{
+					tperto = t0_esfera;		
+					objeto_perto = &objetos[i];
+				}            
+				break;
+
+			case PIRAMIDE:
+				intersecao_piramide(origem_raio, direcao_raio, objetos[i].piramide, &t0_piramide, &t1_piramide, &normal_pir);
+
+				if(t0_piramide == INFINITO)
+				{
+					break;
+				}
+
+				if (t0_piramide  < 0) // Caso o raio tenha intersectado a borda.
+				{ 
+					t0_piramide  = t1_piramide;
+				}
+
+				if (t0_piramide < tperto)
+				{
+					tperto = t0_piramide;
+					objeto_perto = &objetos[i];
+					normal = normal_pir;
+				}
+
+				break;
+			default:
+				break;
         }
         
 		
     }
     
     // Verifica se algum objeto não foi intersectado.
-    if(objeto_perto == 0)
-    {
+    if(objeto_perto == 0) {
         return cor;
     }
     
     // Parte para determinar a cor do pixel com base na iluminação.
-    switch(objeto_perto->tipo)
-    {
-    case ESFERA:
-        
-        // Calcula o ponto de intersecção do raio e da esfera.
-        temp1_v = mult_e(direcao_raio, tperto);
-        ponto_intersec = soma_v(origem_raio, &temp1_v);
-        
-        // Calcula o vetor normal e normaliza-o.
-        normal = sub_v(&ponto_intersec, &objeto_perto->esfera->centro);
-        normal = normalizar(&normal);
-        
-        // Inverte o sentido da normal caso ela esteja dentro da esfera.
-        if(prod_e(direcao_raio, &normal) > 0)
-        {
-                normal = neg_v(&normal);
-        }
-        
-	// Calcula a direção do vetor que sai do ponto até a fonte de luz.
-	direcao_luz = sub_v(&luz_local->posicao, &ponto_intersec);
-	direcao_luz = normalizar(&direcao_luz);
-	
-	// Percore os demais objetos para ver se há algum na frente.
-	luz_direta = 1;
-	for(j = 0; j < num_objetos; j++)
-	{
-		switch(objetos[j].tipo)
-		{
+    switch(objeto_perto->tipo){
 		case ESFERA:
-		    if(intersecao_esfera(&ponto_intersec, &direcao_luz, objetos[j].esfera, &t0_esfera, &t1_esfera))
-		    {
-			    luz_direta = 0;
-		    }
-		    break;
+
+			// Calcula o ponto de intersecção do raio e da esfera.
+			temp1_v = mult_e(direcao_raio, tperto);
+			ponto_intersec = soma_v(origem_raio, &temp1_v);
+
+			// Calcula o vetor normal e normaliza-o.
+			normal = sub_v(&ponto_intersec, &objeto_perto->esfera->centro);
+			normal = normalizar(&normal);
+
+			// Inverte o sentido da normal caso ela esteja dentro da esfera.
+			if(prod_e(direcao_raio, &normal) > 0){
+				normal = neg_v(&normal);
+			}
+
+			// Calcula a direção do vetor que sai do ponto até a fonte de luz.
+			direcao_luz = sub_v(&luz_local->posicao, &ponto_intersec);
+			direcao_luz = normalizar(&direcao_luz);
+
+			// Percore os demais objetos para ver se há algum na frente.
+			luz_direta = 1;
+			for(j = 0; j < num_objetos; j++){
+				switch(objetos[j].tipo){
+					case ESFERA:
+						if(intersecao_esfera(&ponto_intersec, &direcao_luz, objetos[j].esfera, &t0_esfera, &t1_esfera)){
+							luz_direta = 0;
+						}
+						break;
+					case PIRAMIDE:
+						if(intersecao_piramide(&ponto_intersec, &direcao_luz, objetos[j].piramide, &t0_piramide, &t1_piramide, &normal_pir)){
+							luz_direta = 0;
+						}
+						break;
+					default:
+						break;
+				}
+
+				if(!luz_direta)	break;
+			}
+
+			temp2_v = mult_e(&objeto_perto->cor, luz_direta); // Cor do objeto ou sombra
+			temp4_f = max(0.0f, prod_e(&normal, &direcao_luz)); // Entre 0 e 1
+			temp3_v = mult_e(&temp2_v, temp4_f); // Multiplica cor por esse fator (um peso entre 0 e 1)
+			//cor = mult_v(&temp3_v, &luz_local->cor);
+			normal = normalizar(&normal); //modificação adição dessa linha
+
+			cor = calcular_iluminacao(origem_raio, luz_local, luz_ambiente, &ponto_intersec, &normal, &temp3_v, &luz_local->cor);    
+			//adição da linha anterior. Modifiquei colocando temp3_v em vez de temp2_v
+			break;
+
 		case PIRAMIDE:
-		    if(intersecao_piramide(&ponto_intersec, &direcao_luz, objetos[j].piramide, &t0_piramide, &t1_piramide, &normal_pir))
-		    {
-			    luz_direta = 0;
-		    }
-		    break;
+
+		// Calcula o ponto de intersecção do raio e da pirâmide.
+			temp1_v = mult_e(direcao_raio, tperto);
+			ponto_intersec = soma_v(origem_raio, &temp1_v);
+
+		// Percore os demais objetos para ver se há algum na frente.
+		luz_direta = 1;
+		for(j = 0; j < num_objetos; j++){
+				switch(objetos[j].tipo){
+					case ESFERA:
+						if(intersecao_esfera(&ponto_intersec, &direcao_luz, objetos[j].esfera, &t0_esfera, &t1_esfera)){
+							//printf("entrou aqui! esfera \n");
+							luz_direta = 0;
+						}
+						break;
+					case PIRAMIDE:
+						if(intersecao_piramide(&ponto_intersec, &direcao_luz, objetos[j].piramide, &t0_piramide, &t1_piramide, &normal_pir)){
+							//printf("entrou aqui! piramide \n");
+							luz_direta = 0;
+						}
+						break;
+					default:
+						break;
+				}
+
+				if(!luz_direta)	break;
+			}
+
+
+		temp2_v = mult_e(&objeto_perto->cor, luz_direta); // Cor do objeto ou sombra
+		temp4_f = max(0.0f, prod_e(&normal, &direcao_luz)); // Entre 0 e 1
+		temp3_v = mult_e(&temp2_v, temp4_f); // Multiplica cor por esse fator (um peso entre 0 e 1)
+		//adição dessas três proximas linhas
+		normal = normalizar(&normal);
+
+		//Modifiquei colocando objeto_perto->cor em vez de temp2_v
+		cor = calcular_iluminacao(origem_raio, luz_local, luz_ambiente, &ponto_intersec, &normal, &objeto_perto->cor, &luz_local->cor);
+			break;		
+
+
 		default:
-		    break;
-		}
-		
-		if(!luz_direta)
-		{
-		    break;
-		}
-	}
-			
-	temp2_v = mult_e(&objeto_perto->cor, luz_direta); // Cor do objeto ou sombra
-	temp4_f = max(0.0f, prod_e(&normal, &direcao_luz)); // Entre 0 e 1
-	temp3_v = mult_e(&temp2_v, temp4_f); // Multiplica cor por esse fator (um peso entre 0 e 1)
-	cor = mult_v(&temp3_v, &luz_local->cor);
-		    
-        break;
-        
-    case PIRAMIDE:
-    	
-	// Calcula o ponto de intersecção do raio e da pirâmide.
-        temp1_v = mult_e(direcao_raio, tperto);
-        ponto_intersec = soma_v(origem_raio, &temp1_v);
-   
-	// Percore os demais objetos para ver se há algum na frente.
-	luz_direta = 1;
-	for(j = 0; j < num_objetos; j++)
-	{
-		switch(objetos[j].tipo)
-		{
-		case ESFERA:
-		    if(intersecao_esfera(&ponto_intersec, &direcao_luz, objetos[j].esfera, &t0_esfera, &t1_esfera))
-		    {
-			luz_direta = 0;
-		    }
-		    break;
-		case PIRAMIDE:
-		    if(intersecao_piramide(&ponto_intersec, &direcao_luz, objetos[j].piramide, &t0_piramide, &t1_piramide, &normal_pir))
-		    {
-			luz_direta = 0;
-		    }
-		    break;
-		default:
-		    break;
-		}
-		
-		if(!luz_direta)
-		{
-		    break;
-		}
-	}
-		
-		
-	temp2_v = mult_e(&objeto_perto->cor, luz_direta); // Cor do objeto ou sombra
-	normal = normalizar(&normal);
-	cor = calcular_iluminacao(origem_raio, luz_local, luz_ambiente, &ponto_intersec, &normal, &temp2_v, &luz_local->cor);
-        break;		
-		
-    
-    default:
-        break;
+			break;
     }
       
     return cor;
