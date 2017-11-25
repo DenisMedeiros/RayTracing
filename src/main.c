@@ -31,13 +31,20 @@
 
 #define MAX_REC 0
 
+
+/* Configurações de iluminação. */
+
+
+
 /* Configurações da animação. */
 
 //#define GERAR_ANIMACAO
 //#define SCREEN_FPS 24
  
 /* Variáveis globais. */
-luz_t luz; // Fonte de luz
+luz_t luz_ambiente; // Fonte de luz
+luz_t luz_local; // Fonte de luz
+
 objeto_t objetos[NUM_OBJETOS]; // Lista de objetos
 float *pixels; // Matriz de píxels de 3 canais.
 int altura, largura;
@@ -136,7 +143,7 @@ void display(void)
             dir = normalizar(&dir);
             
             // Faz o raytracing.
-            pixel = raytrace(&origem, &dir, objetos, &luz, NUM_OBJETOS, 0, MAX_REC);
+            pixel = raytrace(&origem, &dir, objetos, &luz_local, &luz_ambiente, NUM_OBJETOS, 0, MAX_REC);
 			
 			// Verifica se veio alguma cor (se não, não houve insersecção.
             if(pixel.x != -1)
@@ -318,13 +325,17 @@ int main(int argc, char** argv)
     
     objetos[5].refletivel = 1;
 	*/
-    luz.posicao.x = 0.0;
-    luz.posicao.y = 0.0;
-    luz.posicao.z = 10.0;
+    luz_local.posicao.x = 0.0;
+    luz_local.posicao.y = 0.0;
+    luz_local.posicao.z = 10.0;
 
-    luz.cor.x = 1.0;
-    luz.cor.y = 1.0;
-    luz.cor.z = 1.0;
+    luz_local.cor.x = 1.0;
+    luz_local.cor.y = 1.0;
+    luz_local.cor.z = 1.0;
+    
+    luz_ambiente.cor.x = 1.0;
+    luz_ambiente.cor.y = 1.0;
+    luz_ambiente.cor.z = 1.0;
     
     largura = 400;
     altura = 400;

@@ -11,6 +11,11 @@
 /** Valor de PI. */
 #define PI 3.14159265358979323846
 
+#define KA 0.1
+#define KD 0.8
+#define KS 0.1
+
+#define BRILHO_FLAT 0.8
 /** 
  * Estrutura que define um vetor ou ponto no espaço. 
  * Ela contém apenas as 3 componentes para representar o vetor 
@@ -200,7 +205,7 @@ int intersecao_esfera(ponto_t *origem_raio, vetor_t *direcao_raio, esfera_t *esf
  * origem e o segundo ponto de interseção (é modificada na função).
  * @return 1 se o raio intersecta o piramide, 0 caso contrário.
  */ 
-int intersecao_piramide(ponto_t *origem_raio, vetor_t *direcao_raio, piramide_t *piramide, double *t0, double *t1);
+int intersecao_piramide(ponto_t *origem_raio, vetor_t *direcao_raio, piramide_t *piramide, double *t0, double *t1, vetor_t *normal);
 
 
 /**
@@ -217,7 +222,7 @@ int intersecao_piramide(ponto_t *origem_raio, vetor_t *direcao_raio, piramide_t 
  * origem e o segundo ponto de interseção (é modificada na função).
  * @return 1 se o raio intersecta o piramide, 0 caso contrário.
  */ 
-int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio, triangulo_t *triangulo, double *t0);
+int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio, triangulo_t *triangulo, double *t0, vetor_t *normal);
 
 /** 
  * Faz a operação de raytracing resursiva. 
@@ -230,10 +235,11 @@ int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio, triangulo_
  * @param num_esferas Número de esferas do array anterior.
  * 
  */
-cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, luz_t *luz, int num_objetos, int num_reflexoes, int max_recursoes);
+cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, luz_t *luz_local,  luz_t *luz_ambiente, int num_objetos, int num_reflexoes, int max_recursoes);
 
 
-float brilho(cor_t *cor);
+
+cor_t calcular_iluminacao(ponto_t *origem_raio, luz_t *luz_local, luz_t *luz_ambiente, ponto_t *pos_ponto, vetor_t *normal_ponto, cor_t *cor_ponto, vetor_t *especular_ponto);
 
 
 #endif // GEOMETRIA_H
