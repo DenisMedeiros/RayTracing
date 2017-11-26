@@ -1,17 +1,17 @@
 #include <stdio.h>
+#include <math.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
-#include <math.h>
 #include "geometria.h"
 
-/* Configurações básicas. */
-
+/** Configurações dos objetos. */
 #define NUM_ESFERAS 4
 #define NUM_PIRAMIDES 1
 #define NUM_PLANOS 1
 #define NUM_OBJETOS (NUM_ESFERAS + NUM_PIRAMIDES + NUM_PLANOS)
 
+/** Configurações de visualização (câmera). */
 #define Z_NEAR 1.0
 #define Z_FAR 80.0
 
@@ -23,31 +23,35 @@
 #define LA_Y 0.0 // Look at y
 #define LA_Z 0.0 // Look at z
 
-#define FUNDO_R 1.0
-#define FUNDO_G 1.0
-#define FUNDO_B 1.0
+/** Cor de fundo da cena. */
+#define FUNDO_R 0.0
+#define FUNDO_G 0.0
+#define FUNDO_B 0.0
 
+/** Configurações da movimentação sob a cena. */
 #define PASSO_PAN 0.1 // Em metros
 #define PASSO_GIRO 15 // 15°
 
+/** Configurações da recursão. */
 #define MAX_REC 0
 
+/** Configurações da animação. */
 //#define GERAR_ANIMACAO
 //#define SCREEN_FPS 24
  
-/* Variáveis globais. */
-luz_t luz_ambiente; // Fonte de luz
-luz_t luz_local; // Fonte de luz
+/** Variáveis globais. */
+luz_t luz_ambiente; // Luz ambiente
+luz_t luz_local; // Fonte de luz local (pontual)
 
 objeto_t objetos[NUM_OBJETOS]; // Lista de objetos
 float *pixels; // Matriz de píxels de 3 canais.
 int altura, largura;
 
-double ka;
-double kd;
-double ks;
-double eta;
-double os;
+double ka; // Coeficiente da luz ambiente.
+double kd; // Coeficiente da luz difusa.
+double ks; // Coeficiente da luz especular.
+double eta; // Índice de brilho
+double os; // Propriedade de reflexão do material
 
 #ifdef GERAR_ANIMACAO
 /** Função que faz as mudanças da animação. */
@@ -162,15 +166,11 @@ void display(void)
         }
     }
 
-    
     glDrawPixels(view_port[2], view_port[3], GL_RGB, GL_FLOAT, pixels);
- 
     glPopMatrix();
     glutSwapBuffers();
     glutSwapBuffers();
-    
-    
-    
+
 }
 
 void reshape (int w, int h)
@@ -225,8 +225,9 @@ void keyboard (unsigned char key, int x, int y)
 
 int main(int argc, char** argv)
 {
+    int i;
+    // Criação dos objetos.
     
-    // Criação das esferas
     objetos[0].tipo = ESFERA;
     objetos[0].esfera = malloc(sizeof(esfera_t));
     objetos[0].esfera->centro.x = 0.0;
@@ -237,7 +238,7 @@ int main(int argc, char** argv)
     objetos[0].cor.y = 0.0;
     objetos[0].cor.z = 0.0; 
 	objetos[0].refletivel = 1;
-	//*/
+    
     objetos[1].tipo = ESFERA;
     objetos[1].esfera = malloc(sizeof(esfera_t));
     objetos[1].esfera->centro.x = -2.0;
@@ -270,76 +271,65 @@ int main(int argc, char** argv)
     objetos[3].cor.y = 1.0;
     objetos[3].cor.z = 0.0;
     objetos[3].refletivel = 1; 
-    //*/ 
     
     objetos[4].tipo = PIRAMIDE;
     objetos[4].piramide = malloc(sizeof(piramide_t));
-    
-    objetos[4].piramide->vertices[0].x = 0.0;  //0.0  
-	objetos[4].piramide->vertices[0].y = 0.0;  //0.0
-	objetos[4].piramide->vertices[0].z = -8.0; // -8.0  
-
-    objetos[4].piramide->vertices[1].x = 2.0; //2.0   
-	objetos[4].piramide->vertices[1].y = 0.0; //0.0
-	objetos[4].piramide->vertices[1].z = -8.0; //-8.0  
-	
-	objetos[4].piramide->vertices[2].x = 1.0; //1.0    
-	objetos[4].piramide->vertices[2].y = 2.0; //2.0
-	objetos[4].piramide->vertices[2].z = -8.0; //-8.0
-
-	// Crista
-	objetos[4].piramide->vertices[3].x = 1.0; //1.0
-	objetos[4].piramide->vertices[3].y = 1.0; //1.0
-	objetos[4].piramide->vertices[3].z = -6.0; //-6.0
-
+    objetos[4].piramide->vertices[0].x = 0.0;    
+	objetos[4].piramide->vertices[0].y = 0.0;  
+	objetos[4].piramide->vertices[0].z = -8.0; 
+    objetos[4].piramide->vertices[1].x = 4.0;  
+	objetos[4].piramide->vertices[1].y = 0.0; 
+	objetos[4].piramide->vertices[1].z = -8.0;  
+	objetos[4].piramide->vertices[2].x = 2.0;     
+	objetos[4].piramide->vertices[2].y = 4.0; 
+	objetos[4].piramide->vertices[2].z = -8.0; 
+	objetos[4].piramide->vertices[3].x = 2.0; // Crista
+	objetos[4].piramide->vertices[3].y = 2.0; // Crista
+	objetos[4].piramide->vertices[3].z = -6.0; // Crista
     objetos[4].cor.x = 0.7;
     objetos[4].cor.y = 0.7;
     objetos[4].cor.z = 0.2;
-    
     objetos[4].refletivel = 1;
     
     objetos[5].tipo = PLANO;
     objetos[5].plano = malloc(sizeof(plano_t));
-    
     objetos[5].plano->ponto.x = 0.0;
     objetos[5].plano->ponto.y = 0.0;
     objetos[5].plano->ponto.z = -20.0;
-    
     objetos[5].plano->normal.x = 0.0;
-    objetos[5].plano->normal.y = 0.0;
+    objetos[5].plano->normal.y = 1.0;
     objetos[5].plano->normal.z = 1.0;    
-    
     objetos[5].cor.x = 1.0;
     objetos[5].cor.y = 1.0;
     objetos[5].cor.z = 1.0;
-    
     objetos[5].refletivel = 1;
         
-    // K's da equação de Phong.
+    // Parâmetros da equação de Phong.
     ka = 0.1;
     kd = 0.8;
     ks = 0.1;
-    
     eta = 1.0;
     os = 0.1;
     
-    luz_local.posicao.x = 0.0; //0.0
-    luz_local.posicao.y = 0.0;  //0.0
-    luz_local.posicao.z = 10.0; //10.0
-
+    // Luz pontual.
+    luz_local.posicao.x = 0.0; 
+    luz_local.posicao.y = -0.5;  
+    luz_local.posicao.z = 10.0; 
     luz_local.cor.x = 1.0;
     luz_local.cor.y = 1.0;
     luz_local.cor.z = 1.0;
     
+    // Luz ambiente.
     luz_ambiente.cor.x = 1.0;
     luz_ambiente.cor.y = 1.0;
     luz_ambiente.cor.z = 1.0;
     
+    // Propriedades da janela.
     largura = 400;
     altura = 400;
 
     pixels = (float *) malloc(altura * largura * 3 * sizeof(float));
-
+    
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize(largura, altura); 
@@ -351,10 +341,26 @@ int main(int argc, char** argv)
     glutKeyboardFunc(keyboard);
     glutMainLoop();
 
+    // Libera a memória alocada ao final.
     free(pixels);
-    free(objetos[0].esfera);
-    free(objetos[1].esfera);
-    free(objetos[2].esfera);
-    free(objetos[3].esfera);
+    for(i = 0; i < NUM_OBJETOS; i++)
+    {
+        switch(objetos[i].tipo)
+        {
+            case ESFERA:
+                free(objetos[i].esfera);
+                break;
+            case PIRAMIDE:
+                free(objetos[i].piramide);
+                break;
+            case PLANO:
+                free(objetos[i].plano);
+                break;
+            default:
+                break;
+                            
+        }
+    }
+
     return 0;
 }
