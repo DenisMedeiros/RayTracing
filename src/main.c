@@ -9,7 +9,8 @@
 
 #define NUM_ESFERAS 4
 #define NUM_PIRAMIDES 1
-#define NUM_OBJETOS (NUM_ESFERAS + NUM_PIRAMIDES)
+#define NUM_PLANOS 1
+#define NUM_OBJETOS (NUM_ESFERAS + NUM_PIRAMIDES + NUM_PLANOS)
 
 #define Z_NEAR 1.0
 #define Z_FAR 80.0
@@ -297,38 +298,27 @@ int main(int argc, char** argv)
     
     objetos[4].refletivel = 1;
     
-    /*
-    objetos[5].tipo = PIRAMIDE;
-    objetos[5].piramide = malloc(sizeof(piramide_t));
+    objetos[5].tipo = PLANO;
+    objetos[5].plano = malloc(sizeof(plano_t));
     
-    objetos[5].piramide->vertices[0].x = 5.0;
-	objetos[5].piramide->vertices[0].y = 0.0;
-	objetos[5].piramide->vertices[0].z = -9.0;
-
-    objetos[5].piramide->vertices[1].x = 7.0;
-	objetos[5].piramide->vertices[1].y = 0.0;
-	objetos[5].piramide->vertices[1].z = -9.0;
-
-	objetos[5].piramide->vertices[2].x = 6.0;
-	objetos[5].piramide->vertices[2].y = 2.0;
-	objetos[5].piramide->vertices[2].z = -9.0;
-
-	// Crista
-	objetos[5].piramide->vertices[3].x = 6.0;
-	objetos[5].piramide->vertices[3].y = 1.0;
-	objetos[5].piramide->vertices[3].z = -7.0;
-
+    objetos[5].plano->ponto.x = 0.0;
+    objetos[5].plano->ponto.y = 0.0;
+    objetos[5].plano->ponto.z = -20.0;
+    
+    objetos[5].plano->normal.x = 0.0;
+    objetos[5].plano->normal.y = 0.0;
+    objetos[5].plano->normal.z = 1.0;    
+    
     objetos[5].cor.x = 1.0;
-    objetos[5].cor.y = 0.5;
-    objetos[5].cor.z = 0.5;
+    objetos[5].cor.y = 1.0;
+    objetos[5].cor.z = 1.0;
     
     objetos[5].refletivel = 1;
-	*/
-    
-    // Soma deve dar 1.0? não necessariamente kkk
-    ka = 0.0;
-    kd = 1.0;
-    ks = 0.0;
+        
+    // K's da equação de Phong.
+    ka = 0.1;
+    kd = 0.8;
+    ks = 0.1;
     
     eta = 1.0;
     os = 0.1;

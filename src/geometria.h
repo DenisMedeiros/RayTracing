@@ -51,6 +51,8 @@ typedef struct {
 /** 
  * Estrutura para armazenar um triangulo. 
  * 
+ * Ele precisa de 3 vértices para ser representado.
+ * 
  * 
  */
 typedef struct {
@@ -58,8 +60,19 @@ typedef struct {
 } triangulo_t;
 
 /** 
+ * Estrutura para armazenar um plano. 
+ * 
+ */
+typedef struct {
+    ponto_t ponto;
+    vetor_t normal;
+} plano_t;
+
+
+/** 
  * Estrutura para armazenar uma piramidade. 
  * 
+ * Ela precisa de 4 vértices para ser representada.
  * 
  */
 typedef struct {
@@ -72,14 +85,17 @@ typedef struct {
  * 
  */
 typedef struct {
-    enum {ESFERA, PIRAMIDE} tipo;
+    enum {ESFERA, PIRAMIDE, PLANO} tipo;
     union 
     {
         esfera_t *esfera;
         piramide_t *piramide;
+        plano_t *plano;
     };
+    
 	cor_t cor;
 	char refletivel;
+    
 } objeto_t;
 
 /** 
@@ -225,6 +241,24 @@ int intersecao_piramide(ponto_t *origem_raio, vetor_t *direcao_raio,
  */ 
 int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio, 
     triangulo_t *triangulo, double *t0, vetor_t *normal);
+    
+    
+/**
+ * Verifica se um determinado raio intersecta um plano no espaço.
+ * 
+ * @param origem_raio Ponteiro para o ponto no espaço de onde o 
+ * raio parte.
+ * @param direcao_raio Ponteiro para o vetor que determina a direção
+ * do raio.
+ * @param plano Ponteiro para o plano a ser intersectado.
+ * @param t0 Ponteiro para a distância horizontal entre o ponto de 
+ * origem e o primeiro ponto de interseção (é modificada na função).
+ * @param t1 Ponteiro para a distância horizontal entre o ponto de 
+ * origem e o segundo ponto de interseção (é modificada na função).
+ * @return 1 se o raio intersecta o piramide, 0 caso contrário.
+ */ 
+int intersecao_plano(ponto_t *origem_raio, vetor_t *direcao_raio, 
+    plano_t *plano, double *t0);    
 
 /** 
  * Faz a operação de raytracing resursiva. 
@@ -262,7 +296,8 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, luz_t *luz_local,
 cor_t calcular_iluminacao(ponto_t *origem_raio, luz_t *luz_local, 
     luz_t *luz_ambiente, ponto_t *pos_ponto, vetor_t *normal_ponto, 
     cor_t *cor_ponto);
-
+    
+    
 
 #endif // GEOMETRIA_H
 
