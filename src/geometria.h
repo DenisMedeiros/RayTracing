@@ -1,15 +1,18 @@
 #ifndef GEOMETRIA_H
 #define GEOMETRIA_H
 
- #define max(a,b) \
+#define max(a,b) \
    ({ __typeof__ (a) _a = (a); \
        __typeof__ (b) _b = (b); \
      _a > _b ? _a : _b; })
 
 /** Representa o maior valor de distância dos objetos. */
 #define INFINITO 1.0e10
+
 /** Valor de PI. */
 #define PI 3.14159265358979323846
+
+#define EPSILON 0.0001
 
 /** 
  * Estrutura que define um vetor ou ponto no espaço. 
@@ -183,7 +186,8 @@ vetor_t prod_v(vetor_t *v1, vetor_t *v2);
  * origem e o segundo ponto de interseção (é modificada na função).
  * @return 1 se o raio intersecta a esfera, 0 caso contrário.
  */ 
-int intersecao_esfera(ponto_t *origem_raio, vetor_t *direcao_raio, esfera_t *esfera, double *t0, double *t1);
+int intersecao_esfera(ponto_t *origem_raio, vetor_t *direcao_raio, 
+    esfera_t *esfera, double *t0, double *t1);
 
 
 /**
@@ -193,31 +197,34 @@ int intersecao_esfera(ponto_t *origem_raio, vetor_t *direcao_raio, esfera_t *esf
  * raio parte.
  * @param direcao_raio Ponteiro para o vetor que determina a direção
  * do raio.
- * @param esf Ponteiro para o piramide a ser intersectado.
+ * @param piramide Ponteiro para o piramide a ser intersectada.
  * @param t0 Ponteiro para a distância horizontal entre o ponto de 
  * origem e o primeiro ponto de interseção (é modificada na função).
  * @param t1 Ponteiro para a distância horizontal entre o ponto de 
  * origem e o segundo ponto de interseção (é modificada na função).
+ * @param normal Ponteiro para o vetor normal da face a ser retornado.
  * @return 1 se o raio intersecta o piramide, 0 caso contrário.
  */ 
-int intersecao_piramide(ponto_t *origem_raio, vetor_t *direcao_raio, piramide_t *piramide, double *t0, double *t1, vetor_t *normal);
+int intersecao_piramide(ponto_t *origem_raio, vetor_t *direcao_raio, 
+    piramide_t *piramide, double *t0, double *t1, vetor_t *normal);
 
 
 /**
- * Verifica se um determinado raio intersecta uma piramide no espaço.
+ * Verifica se um determinado raio intersecta um triângulo no espaço.
  * 
  * @param origem_raio Ponteiro para o ponto no espaço de onde o 
  * raio parte.
  * @param direcao_raio Ponteiro para o vetor que determina a direção
  * do raio.
- * @param esf Ponteiro para o piramide a ser intersectado.
+ * @param triangulo Ponteiro para o triângulo a ser intersectado.
  * @param t0 Ponteiro para a distância horizontal entre o ponto de 
  * origem e o primeiro ponto de interseção (é modificada na função).
  * @param t1 Ponteiro para a distância horizontal entre o ponto de 
  * origem e o segundo ponto de interseção (é modificada na função).
  * @return 1 se o raio intersecta o piramide, 0 caso contrário.
  */ 
-int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio, triangulo_t *triangulo, double *t0, vetor_t *normal);
+int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio, 
+    triangulo_t *triangulo, double *t0, vetor_t *normal);
 
 /** 
  * Faz a operação de raytracing resursiva. 
@@ -226,18 +233,36 @@ int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio, triangulo_
  * raio parte.
  * @param direcao_raio Ponteiro para o vetor que determina a direção
  * do raio.
- * @param esferas Array com esferas colocadas no espaço.
+ * @param luz_local Ponteiro para a luz local (pontual).
+ * @param luz_ambiente Ponteiro para a luz ambiente.
+ * @param objetos Array com objetos colocados no espaço.
+ * @param num_objetos Número de objetos do array de objetos.
+ * @param num_reflexoes Número de reflexões (usado na versão recursiva).
+ * @param max_recursoes Número máximo de reflexões (usado na versão recursiva).
  * @param num_esferas Número de esferas do array anterior.
  * 
  */
-cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, objeto_t *objetos, luz_t *luz_local,  luz_t *luz_ambiente, int num_objetos, int num_reflexoes, int max_recursoes);
+cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, luz_t *luz_local,  
+    luz_t *luz_ambiente, objeto_t *objetos, int num_objetos, int num_reflexoes,  
+    int max_recursoes);
 
 
-/* Calcula a luz/cor do objeto. */
-cor_t calcular_iluminacao(ponto_t *origem_raio, luz_t *luz_local, luz_t *luz_ambiente, ponto_t *pos_ponto, vetor_t *normal_ponto, cor_t *cor_ponto);
+/**
+ * Equação de Phong da iluminação, que serve para calcular a cor do objeto.
+ * 
+ * @param origem_raio Ponteiro para o ponto no espaço de onde o 
+ * raio parte.
+ * @param luz_local Ponteiro para a luz local (pontual).
+ * @param luz_ambiente Ponteiro para a luz ambiente.
+ * @param pos_ponto Posição do ponto do objeto a ser avaliado.
+ * @param normal_ponto Vetor normal que indica o plano onde está o ponto.
+ * @param cor_ponto Cor do ponto a ser pintado.
+ * 
+ */ 
+cor_t calcular_iluminacao(ponto_t *origem_raio, luz_t *luz_local, 
+    luz_t *luz_ambiente, ponto_t *pos_ponto, vetor_t *normal_ponto, 
+    cor_t *cor_ponto);
 
-
-void imprimir_vetor(const char *nome, vetor_t *v1);
 
 #endif // GEOMETRIA_H
 

@@ -142,7 +142,7 @@ void display(void)
             dir = normalizar(&dir);
             
             // Faz o raytracing.
-            pixel = raytrace(&origem, &dir, objetos, &luz_local, &luz_ambiente, NUM_OBJETOS, 0, MAX_REC);
+            pixel = raytrace(&origem, &dir, &luz_local, &luz_ambiente,  objetos, NUM_OBJETOS, 0, MAX_REC);
 			
 			// Verifica se veio alguma cor (se não, não houve insersecção.
             if(pixel.x != -1)
@@ -326,12 +326,12 @@ int main(int argc, char** argv)
 	*/
     
     // Soma deve dar 1.0? não necessariamente kkk
-    ka = 0.4;
-    kd = 0.4;
-    ks = 0.2;
+    ka = 0.0;
+    kd = 1.0;
+    ks = 0.0;
     
     eta = 1.0;
-    os = 0.5;
+    os = 0.1;
     
     luz_local.posicao.x = 0.0; //0.0
     luz_local.posicao.y = 0.0;  //0.0
