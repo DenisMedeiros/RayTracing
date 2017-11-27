@@ -417,7 +417,7 @@ int intersecao_plano(ponto_t *origem_raio, vetor_t *direcao_raio,
  */ 
 int intersecao_cubo(ponto_t *origem_raio, vetor_t *direcao_raio, cubo_t *cubo, double *t0, double *t1, vetor_t *normal)
 {
-    double temp;
+    double temp, t0_temp;
     int i, contagem;
     
     contagem = 0;
@@ -472,34 +472,44 @@ int intersecao_cubo(ponto_t *origem_raio, vetor_t *direcao_raio, cubo_t *cubo, d
     triangulos[11].vertices[0] = cubo->vertices[0];
     triangulos[11].vertices[1] = cubo->vertices[1];
     triangulos[11].vertices[2] = cubo->vertices[5];
-    
+
+    *t0 = INFINITO;
 
     for(i = 0; i < 12; i++) 
     {
         // Verifica quais as duas faces que são intersectadas.
         if(intersecao_triangulo(origem_raio, direcao_raio, &triangulos[i], 
-            t0, normal))
+            &t0_temp, normal))
         {
             contagem++;
             
             if(contagem == 1)
             {
-                *t1 = *t0;
+                *t0 = t0_temp; 
+                *t1 = t0_temp;
             }
-            else if (contagem == 2)
+            else
             {
-                if(*t1 < *t0) // Caso o novo t0 seja pior, troque com t1.
+                if(t0_temp < *t0)
                 {
-                    temp = *t1;
                     *t1 = *t0;
-                    *t0 = temp;  
-                }
-                
-                return 1;
+                    *t0 = t0_temp;    
+                }  
+                else if (t0_temp < *t1)
+                {
+                    *t1 = t0_temp;
+                } 
             }
+
         }
     }
     
+
+    if(*t0 != INFINITO)
+    {
+        return 1;
+    }    
+
     return 0;
 }
 

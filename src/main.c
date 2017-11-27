@@ -308,48 +308,48 @@ int main(int argc, char** argv)
     objetos[6].tipo = CUBO;
     objetos[6].cubo = malloc(sizeof(cubo_t));
     
-    objetos[6].cubo->vertices[0].x = -3.0;
-    objetos[6].cubo->vertices[0].y = 5.0;
+    objetos[6].cubo->vertices[0].x = -4.0;
+    objetos[6].cubo->vertices[0].y = 4.0;
     objetos[6].cubo->vertices[0].z = -1.0;
 
-    objetos[6].cubo->vertices[1].x = -3.0;
-    objetos[6].cubo->vertices[1].y = 3.0;
+    objetos[6].cubo->vertices[1].x = -4.0;
+    objetos[6].cubo->vertices[1].y = 2.0;
     objetos[6].cubo->vertices[1].z = -1.0;
 
-    objetos[6].cubo->vertices[2].x = -1.0;
-    objetos[6].cubo->vertices[2].y = 5.0;
+    objetos[6].cubo->vertices[2].x = -2.0;
+    objetos[6].cubo->vertices[2].y = 4.0;
     objetos[6].cubo->vertices[2].z = -1.0;
     
-    objetos[6].cubo->vertices[3].x = -1.0;
-    objetos[6].cubo->vertices[3].y = 3.0;
+    objetos[6].cubo->vertices[3].x = -2.0;
+    objetos[6].cubo->vertices[3].y = 2.0;
     objetos[6].cubo->vertices[3].z = -1.0;
     
-    objetos[6].cubo->vertices[4].x = -3.0;
-    objetos[6].cubo->vertices[4].y = 5.0;
+    objetos[6].cubo->vertices[4].x = -4.0;
+    objetos[6].cubo->vertices[4].y = 4.0;
     objetos[6].cubo->vertices[4].z = 2.0;
 
-    objetos[6].cubo->vertices[5].x = -3.0;
-    objetos[6].cubo->vertices[5].y = 3.0;
+    objetos[6].cubo->vertices[5].x = -4.0;
+    objetos[6].cubo->vertices[5].y = 2.0;
     objetos[6].cubo->vertices[5].z = 2.0;
 
-    objetos[6].cubo->vertices[6].x = -1.0;
-    objetos[6].cubo->vertices[6].y = 5.0;
+    objetos[6].cubo->vertices[6].x = -2.0;
+    objetos[6].cubo->vertices[6].y = 4.0;
     objetos[6].cubo->vertices[6].z = 2.0;
     
-    objetos[6].cubo->vertices[7].x = -1.0;
-    objetos[6].cubo->vertices[7].y = 3.0;
+    objetos[6].cubo->vertices[7].x = -2.0;
+    objetos[6].cubo->vertices[7].y = 2.0;
     objetos[6].cubo->vertices[7].z = 2.0;
 
     objetos[6].cor.x = 1.0;
     objetos[6].cor.y = 0.0;
-    objetos[6].cor.z = 0.0;
+    objetos[6].cor.z = 1.0;
     
     objetos[6].refletivel = 1; 
         
     // Parâmetros da equação de Phong.
-    ka = 0.4;
-    kd = 0.2;
-    ks = 0.4;
+    ka = 0.1;
+    kd = 0.8;
+    ks = 0.1;
     eta = 1.0;
     os = 0.8;
     
