@@ -199,7 +199,6 @@ int intersecao_esfera(ponto_t *origem_raio, vetor_t *direcao_raio,
 
     *normal = sub_v(&ponto_intersec, &esfera->centro);
     *normal = normalizar(normal);
-    
     return 1;
 }
 
@@ -256,6 +255,8 @@ int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio,
     temp1_v = mult_e(direcao_raio, t0_temp);
     ponto_intersec = soma_v(origem_raio, &temp1_v);
 
+	// Faz os 3 testes.
+
     temp1_v = sub_v(&triangulo->vertices[1], &triangulo->vertices[0]);
     temp2_v = sub_v(&ponto_intersec, &triangulo->vertices[0]);
     temp1_v = prod_v(&temp1_v, &temp2_v);
@@ -284,6 +285,7 @@ int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio,
     return 1;
 }
 
+
 /**
  * Verifica se um determinado raio intersecta uma piramide no espaço.
  * 
@@ -292,7 +294,7 @@ int intersecao_triangulo(ponto_t *origem_raio, vetor_t *direcao_raio,
  * @param direcao_raio Ponteiro para o vetor que determina a direção
  * do raio.
  * @param piramide Ponteiro para o piramide a ser intersectada.
- * @param t0 Ponteiro para a distância horizontal entre o ponto de 
+ * @param t0 Ponteiro para a distânci￼￼￼a horizontal entre o ponto de 
  * origem e o primeiro ponto de interseção (é modificada na função).
  * @param t1 Ponteiro para a distância horizontal entre o ponto de 
  * origem e o segundo ponto de interseção (é modificada na função).
@@ -388,7 +390,7 @@ int intersecao_plano(ponto_t *origem_raio, vetor_t *direcao_raio,
     d = prod_e(&plano->normal, &plano->ponto);
     t0_temp = (d - prod_e(&plano->normal, origem_raio))/denominador;
     
-    // Checa se o triângulo está atrás do ponto de origem do raio (observador).
+    // Checa se o plano está atrás do ponto de origem do raio (observador).
     if(t0_temp < 0)
     {
         return 0;

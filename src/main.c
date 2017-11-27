@@ -232,7 +232,7 @@ int main(int argc, char** argv)
     
     objetos[0].tipo = ESFERA;
     objetos[0].esfera = malloc(sizeof(esfera_t));
-    objetos[0].esfera->centro.x = 0.0;
+    objetos[0].esfera->centro.x = 1.0;
     objetos[0].esfera->centro.y = 0.0;
     objetos[0].esfera->centro.z = 0.0;
     objetos[0].esfera->raio = 1;
@@ -243,9 +243,9 @@ int main(int argc, char** argv)
     
     objetos[1].tipo = ESFERA;
     objetos[1].esfera = malloc(sizeof(esfera_t));
-    objetos[1].esfera->centro.x = -2.0; //-2.0
-    objetos[1].esfera->centro.y = 0.0; //0.0
-    objetos[1].esfera->centro.z = 1.0; // 1.0
+    objetos[1].esfera->centro.x = -3.0; //-2.0
+    objetos[1].esfera->centro.y = 3.0; //0.0
+    objetos[1].esfera->centro.z = -5.0; // 1.0
     objetos[1].esfera->raio = 1;
     objetos[1].cor.x = 0.0;
     objetos[1].cor.y = 0.0;
@@ -254,43 +254,47 @@ int main(int argc, char** argv)
     
     objetos[2].tipo = ESFERA;
     objetos[2].esfera = malloc(sizeof(esfera_t));
-    objetos[2].esfera->centro.x = 0.0;
-    objetos[2].esfera->centro.y = -3.0;
-    objetos[2].esfera->centro.z = -1.0;
+    objetos[2].esfera->centro.x = -1.0;
+    objetos[2].esfera->centro.y = -1.0;
+    objetos[2].esfera->centro.z = 4.0;
     objetos[2].esfera->raio = 1;
-    objetos[2].cor.x = 0.0;
-    objetos[2].cor.y = 1.0;
-    objetos[2].cor.z = 0.0;
+    objetos[2].cor.x = 0.1;
+    objetos[2].cor.y = 0.1;
+    objetos[2].cor.z = 0.1;
     objetos[2].refletivel = 1; 
 
     objetos[3].tipo = ESFERA;
     objetos[3].esfera = malloc(sizeof(esfera_t));
-    objetos[3].esfera->centro.x = 0.0;
+    objetos[3].esfera->centro.x = 2.0;
     objetos[3].esfera->centro.y = 3.0;
     objetos[3].esfera->centro.z = 0.0;
     objetos[3].esfera->raio = 1;
     objetos[3].cor.x = 1.0;
     objetos[3].cor.y = 1.0;
-    objetos[3].cor.z = 0.0;
+    objetos[3].cor.z = 1.0;
     objetos[3].refletivel = 1; 
     
     objetos[4].tipo = PIRAMIDE;
     objetos[4].piramide = malloc(sizeof(piramide_t));
     objetos[4].piramide->vertices[0].x = 2.0;    
-    objetos[4].piramide->vertices[0].y = -1.0;   
-    objetos[4].piramide->vertices[0].z = -8.0;   
+    objetos[4].piramide->vertices[0].y = 2.0;   
+    objetos[4].piramide->vertices[0].z = -2.0;  
+     
     objetos[4].piramide->vertices[1].x = 6.0;    
-    objetos[4].piramide->vertices[1].y = -1.0;    
-    objetos[4].piramide->vertices[1].z = -8.0;   
+    objetos[4].piramide->vertices[1].y = 2.0;    
+    objetos[4].piramide->vertices[1].z = -2.0; 
+      
     objetos[4].piramide->vertices[2].x = 4.0;   
-    objetos[4].piramide->vertices[2].y = 0.0;   
-    objetos[4].piramide->vertices[2].z = -10.0;
-    objetos[4].piramide->vertices[3].x = 3.0;   
-    objetos[4].piramide->vertices[3].y = 1.5;    
-    objetos[4].piramide->vertices[3].z = -4.0; 
-    objetos[4].cor.x = 0.7;
+    objetos[4].piramide->vertices[2].y = 2.0;   
+    objetos[4].piramide->vertices[2].z = 0.0;
+    
+    objetos[4].piramide->vertices[3].x = 4.0;   
+    objetos[4].piramide->vertices[3].y = 5.0;    
+    objetos[4].piramide->vertices[3].z = -1.0; 
+    
+    objetos[4].cor.x = 0.1;
     objetos[4].cor.y = 0.7;
-    objetos[4].cor.z = 0.2;
+    objetos[4].cor.z = 0.8;
     objetos[4].refletivel = 1;
     
     objetos[5].tipo = PLANO;
@@ -303,7 +307,7 @@ int main(int argc, char** argv)
     objetos[5].plano->normal.z = 1.0;    
     objetos[5].cor.x = 1.0;
     objetos[5].cor.y = 1.0;
-    objetos[5].cor.z = 1.0;
+    objetos[5].cor.z = 0.0;
     objetos[5].refletivel = 1;
     
     objetos[6].tipo = CUBO;
@@ -348,12 +352,12 @@ int main(int argc, char** argv)
     objetos[6].refletivel = 1; 
         
     // Parâmetros da equação de Phong.
-    ka = 0.0;
-    kd = 0.4;
-    ks = 0.6;
+    ka = 0.1;
+    kd = 0.8;
+    ks = 0.1;
 
     eta = 1.0;
-    os = 0.8;
+    os = 1.0;
     
     // Luz pontual.
     luz_local.posicao.x = 0.0; 
