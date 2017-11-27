@@ -168,7 +168,7 @@ void display(void)
         }
     }
 
-    glDrawPixels(view_port[2], view_port[3], GL_RGB, GL_FLOAT, pixels);
+    glDrawPixels(largura, altura, GL_RGB, GL_FLOAT, pixels);
     glPopMatrix();
     glutSwapBuffers();
     glutSwapBuffers();
