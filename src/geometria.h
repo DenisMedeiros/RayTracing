@@ -332,23 +332,22 @@ cor_t equacao_phong(ponto_t *origem_raio, luz_t *luz_local,
     
     
 /**
- * Equação para calcular cor do ponto.
+ * Equação de Phong da iluminação, que serve para calcular a cor do objeto.
  * 
  * @param origem_raio Ponteiro para o ponto no espaço de onde o 
  * raio parte.
  * @param luz_local Ponteiro para a luz local (pontual).
  * @param luz_ambiente Ponteiro para a luz ambiente.
- * @param pos_ponto Posição do ponto do objeto a ser avaliado.
- * @param normal_ponto Vetor normal que indica o plano onde está o ponto.
- * @param cor_ponto Cor do ponto a ser pintado.
+ * @param objetos Array de objetos.
+ * @param num_objetos Número e objetos no array.
+ * @param objeto_perto Objeto mais perto da câmera.
+ * @param ponto_intersec Ponto de interseção entre o raio e o objeto.
+ * @param normal Vetor normal que indica o plano onde está o ponto.
  * 
  */ 
 cor_t calcular_iluminacao(ponto_t *origem_raio, vetor_t *direcao_raio, 
     luz_t *luz_local, luz_t *luz_ambiente, objeto_t *objetos, int num_objetos, 
     objeto_t *objeto_perto, ponto_t *ponto_intersec, vetor_t *normal);
-
-    
-    
 
 #endif // GEOMETRIA_H
 

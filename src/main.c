@@ -55,6 +55,7 @@ double eta; // Índice de brilho
 double os; // Propriedade de reflexão do material
 
 #ifdef GERAR_ANIMACAO
+
 /** Função que faz as mudanças da animação. */
 void loop(int x)
 { 
@@ -275,18 +276,18 @@ int main(int argc, char** argv)
     
     objetos[4].tipo = PIRAMIDE;
     objetos[4].piramide = malloc(sizeof(piramide_t));
-    objetos[4].piramide->vertices[0].x = 2.0;    //2.0
-    objetos[4].piramide->vertices[0].y = -1.0;    //0.0
-    objetos[4].piramide->vertices[0].z = -8.0;   //-8.0
-    objetos[4].piramide->vertices[1].x = 6.0;    //6.0
-    objetos[4].piramide->vertices[1].y = -1.0;    //0.0
-    objetos[4].piramide->vertices[1].z = -8.0;   //-8.0
-    objetos[4].piramide->vertices[2].x = 4.0;    //4.0
-    objetos[4].piramide->vertices[2].y = 0.0;    //1.0
-    objetos[4].piramide->vertices[2].z = -10.0;  //-10.0
-    objetos[4].piramide->vertices[3].x = 3.0;    //3.0   // Crista
-    objetos[4].piramide->vertices[3].y = 1.5;    //2.5   // Crista
-    objetos[4].piramide->vertices[3].z = -4.0;   //-4.0   // Crista
+    objetos[4].piramide->vertices[0].x = 2.0;    
+    objetos[4].piramide->vertices[0].y = -1.0;   
+    objetos[4].piramide->vertices[0].z = -8.0;   
+    objetos[4].piramide->vertices[1].x = 6.0;    
+    objetos[4].piramide->vertices[1].y = -1.0;    
+    objetos[4].piramide->vertices[1].z = -8.0;   
+    objetos[4].piramide->vertices[2].x = 4.0;   
+    objetos[4].piramide->vertices[2].y = 0.0;   
+    objetos[4].piramide->vertices[2].z = -10.0;
+    objetos[4].piramide->vertices[3].x = 3.0;   
+    objetos[4].piramide->vertices[3].y = 1.5;    
+    objetos[4].piramide->vertices[3].z = -4.0; 
     objetos[4].cor.x = 0.7;
     objetos[4].cor.y = 0.7;
     objetos[4].cor.z = 0.2;
@@ -324,21 +325,21 @@ int main(int argc, char** argv)
     objetos[6].cubo->vertices[3].y = 2.0;
     objetos[6].cubo->vertices[3].z = -1.0;
     
-    objetos[6].cubo->vertices[4].x = -4.0; //-4.0
-    objetos[6].cubo->vertices[4].y = 4.0; //4.0
-    objetos[6].cubo->vertices[4].z = 2.0; //2.0
+    objetos[6].cubo->vertices[4].x = -4.0; 
+    objetos[6].cubo->vertices[4].y = 4.0; 
+    objetos[6].cubo->vertices[4].z = 1.0; 
 
-    objetos[6].cubo->vertices[5].x = -4.0; //-4.0
-    objetos[6].cubo->vertices[5].y = 2.0; //2.0
-    objetos[6].cubo->vertices[5].z = 2.0; //2.0
+    objetos[6].cubo->vertices[5].x = -4.0; 
+    objetos[6].cubo->vertices[5].y = 2.0; 
+    objetos[6].cubo->vertices[5].z = 1.0;
 
-    objetos[6].cubo->vertices[6].x = -2.0; //-2.0
-    objetos[6].cubo->vertices[6].y = 4.0; //4.0
-    objetos[6].cubo->vertices[6].z = 2.0; //2.0
+    objetos[6].cubo->vertices[6].x = -2.0; 
+    objetos[6].cubo->vertices[6].y = 4.0; 
+    objetos[6].cubo->vertices[6].z = 1.0; 
     
-    objetos[6].cubo->vertices[7].x = -2.0; //-2.0
-    objetos[6].cubo->vertices[7].y = 2.0; //2.0
-    objetos[6].cubo->vertices[7].z = 2.0; //2.0
+    objetos[6].cubo->vertices[7].x = -2.0; 
+    objetos[6].cubo->vertices[7].y = 2.0; 
+    objetos[6].cubo->vertices[7].z = 1.0; 
 
     objetos[6].cor.x = 1.0;
     objetos[6].cor.y = 0.0;
@@ -347,9 +348,10 @@ int main(int argc, char** argv)
     objetos[6].refletivel = 1; 
         
     // Parâmetros da equação de Phong.
-    ka = 0.1;
-    kd = 0.8;
-    ks = 0.1;
+    ka = 0.0;
+    kd = 0.4;
+    ks = 0.6;
+
     eta = 1.0;
     os = 0.8;
     

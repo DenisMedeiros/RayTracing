@@ -417,12 +417,10 @@ int intersecao_plano(ponto_t *origem_raio, vetor_t *direcao_raio,
  */ 
 int intersecao_cubo(ponto_t *origem_raio, vetor_t *direcao_raio, cubo_t *cubo, double *t0, double *t1, vetor_t *normal)
 {
-    double temp, t0_temp;
+    double t0_temp;
 	vetor_t normal_temp;
-    int i, contagem;
-    
-    contagem = 0;
-    
+    int i;
+   
     // Construindo os triângulos
     triangulo_t triangulos[12];
         
@@ -744,7 +742,20 @@ cor_t equacao_phong(ponto_t *origem_raio, luz_t *luz_local,
 }
 
 
-
+/**
+ * Equação de Phong da iluminação, que serve para calcular a cor do objeto.
+ * 
+ * @param origem_raio Ponteiro para o ponto no espaço de onde o 
+ * raio parte.
+ * @param luz_local Ponteiro para a luz local (pontual).
+ * @param luz_ambiente Ponteiro para a luz ambiente.
+ * @param objetos Array de objetos.
+ * @param num_objetos Número e objetos no array.
+ * @param objeto_perto Objeto mais perto da câmera.
+ * @param ponto_intersec Ponto de interseção entre o raio e o objeto.
+ * @param normal Vetor normal que indica o plano onde está o ponto.
+ * 
+ */ 
 cor_t calcular_iluminacao(ponto_t *origem_raio, vetor_t *direcao_raio, 
     luz_t *luz_local, luz_t *luz_ambiente, objeto_t *objetos, int num_objetos, 
     objeto_t *objeto_perto, ponto_t *ponto_intersec, vetor_t *normal)
@@ -765,16 +776,16 @@ cor_t calcular_iluminacao(ponto_t *origem_raio, vetor_t *direcao_raio,
     direcao_luz = normalizar(&direcao_luz);
     
     for(j = 0; j < num_objetos; j++)
-    {
-        //t0 = INFINITO; //alteração
-		//t1 = INFINITO; //alteração
-		
+    {		
         if (objetos[j].tipo == ESFERA)
         {
             if(intersecao_esfera(ponto_intersec, &direcao_luz, 
                 objetos[j].esfera, &t0, &t1, &temp1_v))
             {
-                luz_direta = 0;
+                if(objeto_perto != &objetos[j])
+                {
+					luz_direta = 0;
+                }
             }
         }
         else if (objetos[j].tipo == PIRAMIDE)
@@ -783,18 +794,19 @@ cor_t calcular_iluminacao(ponto_t *origem_raio, vetor_t *direcao_raio,
                 objetos[j].piramide, &t0, &t1, 
                 &temp1_v))
             {
-                luz_direta = 0;
+                if(objeto_perto != &objetos[j])
+                {
+					luz_direta = 0;
+                }
             }
         }
         else if (objetos[j].tipo == CUBO)
         {
-			//normal = &temp1_v; // alterado
                         
             if(intersecao_cubo(ponto_intersec, &direcao_luz, 
                 objetos[j].cubo, &t0, &t1, 
                 &temp1_v))
             {
-				//printf("normal: (%f, %f, %f) \n", temp1_v.x,temp1_v.y, temp1_v.z);  // alterado
                 if(objeto_perto != &objetos[j])
                 {
 					luz_direta = 0;
@@ -831,7 +843,7 @@ cor_t calcular_iluminacao(ponto_t *origem_raio, vetor_t *direcao_raio,
         luz_local_final.cor.z = 0.0;
     }
 
-	
+	// Calcula a cor a partir da equação de Phong.
     cor_final = equacao_phong(origem_raio, &luz_local_final, luz_ambiente, 
         ponto_intersec, normal, &objeto_perto->cor);    
     
