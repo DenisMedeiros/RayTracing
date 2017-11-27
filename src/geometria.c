@@ -418,6 +418,7 @@ int intersecao_plano(ponto_t *origem_raio, vetor_t *direcao_raio,
 int intersecao_cubo(ponto_t *origem_raio, vetor_t *direcao_raio, cubo_t *cubo, double *t0, double *t1, vetor_t *normal)
 {
     double temp, t0_temp;
+	vetor_t normal_temp;
     int i, contagem;
     
     contagem = 0;
@@ -479,29 +480,30 @@ int intersecao_cubo(ponto_t *origem_raio, vetor_t *direcao_raio, cubo_t *cubo, d
     {
         // Verifica quais as duas faces que são intersectadas.
         if(intersecao_triangulo(origem_raio, direcao_raio, &triangulos[i], 
-            &t0_temp, normal))
+            &t0_temp, &normal_temp))
         {
-            contagem++;
             
-            if(contagem == 1)
-            {
-                *t0 = t0_temp; 
-                *t1 = t0_temp;
-            }
-            else
-            {
-                if(t0_temp < *t0)
-                {
-                    *t1 = *t0;
-                    *t0 = t0_temp;    
-                }  
-                else if (t0_temp < *t1)
-                {
-                    *t1 = t0_temp;
-                } 
-            }
+			if(i == 1)
+			{
+				*t0 = t0_temp; 
+				*t1 = t0_temp;
+				*normal = normal_temp;
+			}
+			else
+			{
+				if(t0_temp < *t0)
+				{
+					*t1 = *t0;
+					*t0 = t0_temp;    
+					*normal = normal_temp;
+				}  
+				else if (t0_temp < *t1)
+				{
+					*t1 = t0_temp;
+				} 
+			}
+		}
 
-        }
     }
     
 
@@ -764,7 +766,9 @@ cor_t calcular_iluminacao(ponto_t *origem_raio, vetor_t *direcao_raio,
     
     for(j = 0; j < num_objetos; j++)
     {
-        
+        //t0 = INFINITO; //alteração
+		//t1 = INFINITO; //alteração
+		
         if (objetos[j].tipo == ESFERA)
         {
             if(intersecao_esfera(ponto_intersec, &direcao_luz, 
@@ -784,14 +788,16 @@ cor_t calcular_iluminacao(ponto_t *origem_raio, vetor_t *direcao_raio,
         }
         else if (objetos[j].tipo == CUBO)
         {
+			//normal = &temp1_v; // alterado
                         
             if(intersecao_cubo(ponto_intersec, &direcao_luz, 
                 objetos[j].cubo, &t0, &t1, 
                 &temp1_v))
             {
+				//printf("normal: (%f, %f, %f) \n", temp1_v.x,temp1_v.y, temp1_v.z);  // alterado
                 if(objeto_perto != &objetos[j])
                 {
-                    luz_direta = 0;
+					luz_direta = 0;
                 }
             }
         }
@@ -825,6 +831,7 @@ cor_t calcular_iluminacao(ponto_t *origem_raio, vetor_t *direcao_raio,
         luz_local_final.cor.z = 0.0;
     }
 
+	
     cor_final = equacao_phong(origem_raio, &luz_local_final, luz_ambiente, 
         ponto_intersec, normal, &objeto_perto->cor);    
     
