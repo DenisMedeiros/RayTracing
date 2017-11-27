@@ -8,8 +8,9 @@
 /** Configurações dos objetos. */
 #define NUM_ESFERAS 4
 #define NUM_PIRAMIDES 1
+#define NUM_CUBOS 1
 #define NUM_PLANOS 1
-#define NUM_OBJETOS (NUM_ESFERAS + NUM_PIRAMIDES + NUM_PLANOS)
+#define NUM_OBJETOS (NUM_ESFERAS + NUM_PIRAMIDES + NUM_CUBOS + NUM_PLANOS)
 
 /** Configurações de visualização (câmera). */
 #define Z_NEAR 1.0
@@ -148,8 +149,8 @@ void display(void)
             
             // Faz o raytracing.
             pixel = raytrace(&origem, &dir, &luz_local, &luz_ambiente,  objetos, NUM_OBJETOS, 0, MAX_REC);
-			
-			// Verifica se veio alguma cor (se não, não houve insersecção.
+            
+            // Verifica se veio alguma cor (se não, não houve insersecção.
             if(pixel.x != -1)
             {
                 pixels[(i * largura * 3) + (j * 3) + 0] = pixel.x;
@@ -237,7 +238,7 @@ int main(int argc, char** argv)
     objetos[0].cor.x = 1.0;
     objetos[0].cor.y = 0.0;
     objetos[0].cor.z = 0.0; 
-	objetos[0].refletivel = 1;
+    objetos[0].refletivel = 1;
     
     objetos[1].tipo = ESFERA;
     objetos[1].esfera = malloc(sizeof(esfera_t));
@@ -249,7 +250,7 @@ int main(int argc, char** argv)
     objetos[1].cor.y = 0.0;
     objetos[1].cor.z = 1.0;
     objetos[1].refletivel = 1; 
-	
+    
     objetos[2].tipo = ESFERA;
     objetos[2].esfera = malloc(sizeof(esfera_t));
     objetos[2].esfera->centro.x = 0.0;
@@ -275,17 +276,17 @@ int main(int argc, char** argv)
     objetos[4].tipo = PIRAMIDE;
     objetos[4].piramide = malloc(sizeof(piramide_t));
     objetos[4].piramide->vertices[0].x = 0.0;    
-	objetos[4].piramide->vertices[0].y = 0.0;  
-	objetos[4].piramide->vertices[0].z = -8.0; 
+    objetos[4].piramide->vertices[0].y = 0.0;  
+    objetos[4].piramide->vertices[0].z = -8.0; 
     objetos[4].piramide->vertices[1].x = 4.0;  
-	objetos[4].piramide->vertices[1].y = 0.0; 
-	objetos[4].piramide->vertices[1].z = -8.0;  
-	objetos[4].piramide->vertices[2].x = 2.0;     
-	objetos[4].piramide->vertices[2].y = 4.0; 
-	objetos[4].piramide->vertices[2].z = -8.0; 
-	objetos[4].piramide->vertices[3].x = 2.0; // Crista
-	objetos[4].piramide->vertices[3].y = 2.0; // Crista
-	objetos[4].piramide->vertices[3].z = -6.0; // Crista
+    objetos[4].piramide->vertices[1].y = 0.0; 
+    objetos[4].piramide->vertices[1].z = -8.0;  
+    objetos[4].piramide->vertices[2].x = 2.0;     
+    objetos[4].piramide->vertices[2].y = 4.0; 
+    objetos[4].piramide->vertices[2].z = -8.0; 
+    objetos[4].piramide->vertices[3].x = 2.0; // Crista
+    objetos[4].piramide->vertices[3].y = 2.0; // Crista
+    objetos[4].piramide->vertices[3].z = -6.0; // Crista
     objetos[4].cor.x = 0.7;
     objetos[4].cor.y = 0.7;
     objetos[4].cor.z = 0.2;
@@ -303,13 +304,54 @@ int main(int argc, char** argv)
     objetos[5].cor.y = 1.0;
     objetos[5].cor.z = 1.0;
     objetos[5].refletivel = 1;
+    
+    objetos[6].tipo = CUBO;
+    objetos[6].cubo = malloc(sizeof(cubo_t));
+    
+    objetos[6].cubo->vertices[0].x = -3.0;
+    objetos[6].cubo->vertices[0].y = 5.0;
+    objetos[6].cubo->vertices[0].z = -1.0;
+
+    objetos[6].cubo->vertices[1].x = -3.0;
+    objetos[6].cubo->vertices[1].y = 3.0;
+    objetos[6].cubo->vertices[1].z = -1.0;
+
+    objetos[6].cubo->vertices[2].x = -1.0;
+    objetos[6].cubo->vertices[2].y = 5.0;
+    objetos[6].cubo->vertices[2].z = -1.0;
+    
+    objetos[6].cubo->vertices[3].x = -1.0;
+    objetos[6].cubo->vertices[3].y = 3.0;
+    objetos[6].cubo->vertices[3].z = -1.0;
+    
+    objetos[6].cubo->vertices[4].x = -3.0;
+    objetos[6].cubo->vertices[4].y = 5.0;
+    objetos[6].cubo->vertices[4].z = 2.0;
+
+    objetos[6].cubo->vertices[5].x = -3.0;
+    objetos[6].cubo->vertices[5].y = 3.0;
+    objetos[6].cubo->vertices[5].z = 2.0;
+
+    objetos[6].cubo->vertices[6].x = -1.0;
+    objetos[6].cubo->vertices[6].y = 5.0;
+    objetos[6].cubo->vertices[6].z = 2.0;
+    
+    objetos[6].cubo->vertices[7].x = -1.0;
+    objetos[6].cubo->vertices[7].y = 3.0;
+    objetos[6].cubo->vertices[7].z = 2.0;
+
+    objetos[6].cor.x = 1.0;
+    objetos[6].cor.y = 0.0;
+    objetos[6].cor.z = 0.0;
+    
+    objetos[6].refletivel = 1; 
         
     // Parâmetros da equação de Phong.
-    ka = 0.1;
-    kd = 0.8;
-    ks = 0.1;
+    ka = 0.4;
+    kd = 0.2;
+    ks = 0.4;
     eta = 1.0;
-    os = 0.1;
+    os = 0.8;
     
     // Luz pontual.
     luz_local.posicao.x = 0.0; 
@@ -345,21 +387,22 @@ int main(int argc, char** argv)
     free(pixels);
     for(i = 0; i < NUM_OBJETOS; i++)
     {
-        switch(objetos[i].tipo)
+        if (objetos[i].tipo == ESFERA)
         {
-            case ESFERA:
-                free(objetos[i].esfera);
-                break;
-            case PIRAMIDE:
-                free(objetos[i].piramide);
-                break;
-            case PLANO:
-                free(objetos[i].plano);
-                break;
-            default:
-                break;
-                            
+            free(objetos[i].esfera);
         }
+        else if (objetos[i].tipo == PIRAMIDE)        
+        {
+            free(objetos[i].piramide);
+        }
+        else if (objetos[i].tipo == CUBO)        
+        {
+            free(objetos[i].cubo);
+        }        
+        else if (objetos[i].tipo == PLANO)        
+        {
+            free(objetos[i].plano);
+        }        
     }
 
     return 0;

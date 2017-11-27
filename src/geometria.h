@@ -60,6 +60,29 @@ typedef struct {
 } triangulo_t;
 
 /** 
+ * Estrutura para armazenar uma piramidade. 
+ * 
+ * Ela precisa de 4 vértices para ser representada.
+ * 
+ */
+typedef struct {
+    ponto_t vertices[4];
+} piramide_t;
+
+/** 
+ * Estrutura para armazenar um cubo. 
+ * 
+ * Para ser representado, a esfera precisa de um centro e do tamanho do lado.
+ * Os vértices devem ser fornecidos iniciando de cima para baixo, depois esquerda
+ * para direita e por fim da frente para trás.
+ * 
+ */
+typedef struct {
+    ponto_t vertices[8];
+} cubo_t;
+
+
+/** 
  * Estrutura para armazenar um plano. 
  * 
  */
@@ -70,31 +93,23 @@ typedef struct {
 
 
 /** 
- * Estrutura para armazenar uma piramidade. 
- * 
- * Ela precisa de 4 vértices para ser representada.
- * 
- */
-typedef struct {
-    ponto_t vertices[4];
-} piramide_t;
-
-
-/** 
  * Estrutura para armazenar um objeto (pode ser esfera ou cubo).
  * 
  */
-typedef struct {
-    enum {ESFERA, PIRAMIDE, PLANO} tipo;
+typedef struct 
+{
+    enum {ESFERA, PIRAMIDE, CUBO, PLANO} tipo;
+    
     union 
     {
         esfera_t *esfera;
         piramide_t *piramide;
+        cubo_t *cubo;
         plano_t *plano;
     };
     
-	cor_t cor;
-	char refletivel;
+    cor_t cor;
+    char refletivel;
     
 } objeto_t;
 
@@ -203,7 +218,7 @@ vetor_t prod_v(vetor_t *v1, vetor_t *v2);
  * @return 1 se o raio intersecta a esfera, 0 caso contrário.
  */ 
 int intersecao_esfera(ponto_t *origem_raio, vetor_t *direcao_raio, 
-    esfera_t *esfera, double *t0, double *t1);
+    esfera_t *esfera, double *t0, double *t1, vetor_t *normal);
 
 
 /**
@@ -224,6 +239,24 @@ int intersecao_esfera(ponto_t *origem_raio, vetor_t *direcao_raio,
 int intersecao_piramide(ponto_t *origem_raio, vetor_t *direcao_raio, 
     piramide_t *piramide, double *t0, double *t1, vetor_t *normal);
 
+
+
+/**
+ * Verifica se um determinado raio intersecta uma cubo no espaço.
+ * 
+ * @param origem_raio Ponteiro para o ponto no espaço de onde o 
+ * raio parte.
+ * @param direcao_raio Ponteiro para o vetor que determina a direção
+ * do raio.
+ * @param esf Ponteiro para o cubo a ser intersectado.
+ * @param t0 Ponteiro para a distância horizontal entre o ponto de 
+ * origem e o primeiro ponto de interseção (é modificada na função).
+ * @param t1 Ponteiro para a distância horizontal entre o ponto de 
+ * origem e o segundo ponto de interseção (é modificada na função).
+ * @return 1 se o raio intersecta o cubo, 0 caso contrário.
+ */ 
+int intersecao_cubo(ponto_t *origem_raio, vetor_t *direcao_raio, cubo_t *cubo, 
+    double *t0, double *t1, vetor_t *normal);
 
 /**
  * Verifica se um determinado raio intersecta um triângulo no espaço.
@@ -293,9 +326,27 @@ cor_t raytrace(ponto_t *origem_raio, vetor_t *direcao_raio, luz_t *luz_local,
  * @param cor_ponto Cor do ponto a ser pintado.
  * 
  */ 
-cor_t calcular_iluminacao(ponto_t *origem_raio, luz_t *luz_local, 
+cor_t equacao_phong(ponto_t *origem_raio, luz_t *luz_local, 
     luz_t *luz_ambiente, ponto_t *pos_ponto, vetor_t *normal_ponto, 
     cor_t *cor_ponto);
+    
+    
+/**
+ * Equação para calcular cor do ponto.
+ * 
+ * @param origem_raio Ponteiro para o ponto no espaço de onde o 
+ * raio parte.
+ * @param luz_local Ponteiro para a luz local (pontual).
+ * @param luz_ambiente Ponteiro para a luz ambiente.
+ * @param pos_ponto Posição do ponto do objeto a ser avaliado.
+ * @param normal_ponto Vetor normal que indica o plano onde está o ponto.
+ * @param cor_ponto Cor do ponto a ser pintado.
+ * 
+ */ 
+cor_t calcular_iluminacao(ponto_t *origem_raio, vetor_t *direcao_raio, 
+    luz_t *luz_local, luz_t *luz_ambiente, objeto_t *objetos, int num_objetos, 
+    objeto_t *objeto_perto, ponto_t *ponto_intersec, vetor_t *normal);
+
     
     
 
