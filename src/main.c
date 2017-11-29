@@ -4,6 +4,11 @@
 #include <GL/glu.h>
 #include <GL/glut.h>
 #include "geometria.h"
+#include <omp.h>
+
+/** Paralelismo */
+#define PARALELO
+#define NUM_THREADS 4
 
 /** Configurações dos objetos. */
 #define NUM_ESFERAS 4
@@ -117,13 +122,14 @@ void display(void)
         pixels = (float *) malloc(altura * largura * 3 * sizeof(float));
     }
     
-    // Define os pontos na tela.
-    win_x = 0;
-    win_y = 0;
-
-
     for(i = 0; i < altura; i++) // Percorre as linhas (altura)
     {
+# ifdef PARALELO
+        # pragma omp parallel for num_threads(NUM_THREADS) default(none) \
+            shared(pixels, i, altura, luz_ambiente, luz_local, largura, \
+            model_view, projection, view_port, objetos) private(win_x, win_y, \
+            x_near, y_near, z_near, x_far, y_far, z_far, origem, dir, pixel) 
+# endif
         for(j = 0; j < largura; j++) // Percorre as colunas (largura)
         {
             win_x = j;

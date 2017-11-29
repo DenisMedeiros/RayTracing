@@ -1,8 +1,8 @@
 src = $(wildcard *.c)
 obj = $(src:.c=.o)
 
-CCFLAGS = -Wall -O2 -g
-LDFLAGS = -lm -lGL -lGLU -lglut
+CCFLAGS = -Wall -O2 -g -fopenmp
+LDFLAGS = -lm -lGL -lGLU -lglut 
 
 CC = gcc $(CCFLAGS)
 
