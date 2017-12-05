@@ -8,7 +8,7 @@
 
 /** Paralelismo */
 #define PARALELO
-#define NUM_THREADS 4
+#define NUM_THREADS 8
 
 /** Configurações dos objetos. */
 #define NUM_ESFERAS 4
@@ -121,15 +121,14 @@ void display(void)
         
         pixels = (float *) malloc(altura * largura * 3 * sizeof(float));
     }
-    
+ # ifdef PARALELO
+        # pragma omp parallel for num_threads(NUM_THREADS) default(none) \
+            shared(pixels, altura, luz_ambiente, luz_local, largura, \
+            model_view, projection, view_port, objetos) private(win_x, win_y, \
+            x_near, y_near, z_near, x_far, y_far, z_far, origem, dir, pixel, i, j)  collapse(2) schedule(dynamic,1)
+# endif   
     for(i = 0; i < altura; i++) // Percorre as linhas (altura)
     {
-# ifdef PARALELO
-        # pragma omp parallel for num_threads(NUM_THREADS) default(none) \
-            shared(pixels, i, altura, luz_ambiente, luz_local, largura, \
-            model_view, projection, view_port, objetos) private(win_x, win_y, \
-            x_near, y_near, z_near, x_far, y_far, z_far, origem, dir, pixel) 
-# endif
         for(j = 0; j < largura; j++) // Percorre as colunas (largura)
         {
             win_x = j;
